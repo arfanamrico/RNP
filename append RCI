@@ -1,0 +1,33 @@
+import pandas as pd
+import os
+
+dirpath = r'D:\TSEL\RCI'
+
+def satu ():
+    global data,n
+    df = pd.read_csv(path)
+    data = pd.DataFrame(df)
+    data = data[data['region']== 'SUMBAGTENG']
+    print (f'file ke {nam} telah di append')
+    n += 1
+
+def gabung ():
+    global data,n
+    try:
+        df = pd.read_csv(path)
+        df = pd.DataFrame(df)
+        df = df[df['region']== 'SUMBAGTENG']
+        data = pd.merge(data,df, how='outer')
+        print (f'file ke {nam} telah di append')
+        n += 1
+    except:pass
+n = 1
+for name in os.listdir(dirpath):
+    path = os.path.join(dirpath, name)    
+    if path.endswith('.csv') and os.path.isfile(path):
+        nam = name[20:23]
+        if n == 1:
+            satu ()
+        else:
+            gabung ()
+print(data)
