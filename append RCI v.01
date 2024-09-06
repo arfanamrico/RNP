@@ -1,0 +1,23 @@
+import pandas as pd
+import os
+
+dirpath = r'D:\TSEL\RCI'
+rci = []
+def satu ():
+    lines = open(path).read().splitlines()
+    items = [line.split(',') for line in lines]
+    for val in items:
+        if val[1] == 'SUMBAGTENG':
+            rci.append([val[0],val[1],val[9],val[14],val[18],val[60],val[84]])
+        else: pass
+    print (f'file ke {nam} telah di append')
+
+for name in os.listdir(dirpath):
+    path = os.path.join(dirpath, name)    
+    if path.endswith('.csv') and os.path.isfile(path):
+        nam = name[20:23]
+        # if n == 1:
+        satu ()
+        # else:
+        #     gabung ()
+print(pd.DataFrame(rci))
