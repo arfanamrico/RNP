@@ -1,0 +1,44 @@
+import pandas as pd
+
+
+filename = 'IRR.xlsx'
+dirpath = r"D:\TSEL\MCOM_TSEL_W30_2024\MCOM_R10_4G_TSEL_W30_2024\MCOM_R10_4G_TSEL_W30_2024.xlsx"
+heder = ['VENDOR','SITE_ID','NE_ID','SITE_NAME','LONG','LAT','BAND','BTS_TYPE','SECTOR','ANTENA_HEIGHT','ANTENA_TYPE']
+data = []
+siteid = '421D230E'
+df = pd.read_excel(dirpath)
+df = pd.DataFrame(df)
+df = df[['VENDOR','Site ID','NE ID','Site_Name','Longitude','Latitude','Legend','Cell_Type','Sector','Antenna Height ','Ant_Type']]
+# lissite = set(df['Site ID'])
+lissite = ['BKG302']
+# df['Site ID'] =  df['eNodeB Name'].str.split('_').str[0]
+
+def satu ():
+    VENDOR,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],dq.loc[0,'Sector'],dq.loc[0,'Antenna Height '],dq.loc[0,'Ant_Type']
+    data.append([VENDOR,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE])
+def dua ():
+    try:
+        VENDOR,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}_{dq.loc[1,'Sector']}',dq.loc[0,'Antenna Height '],dq.loc[0,'Ant_Type']
+        data.append([VENDOR,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE])
+    except:pass
+def tiga ():
+    try:
+        VENDOR,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}_{dq.loc[1,'Sector']}_{dq.loc[2,'Sector']}',dq.loc[0,'Antenna Height '],dq.loc[0,'Ant_Type']
+        data.append([VENDOR,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE])
+    except:pass
+
+for s in lissite:
+    ds = df[df['Site ID'] == s]
+    lisband = set(ds['Legend'])
+    for band in lisband:
+        dq = ds[ds['Legend'] == band].reset_index()
+        if len(dq['Site ID']) == 1: 
+            satu ()
+        elif len(dq['Site ID']) == 2: 
+            dua ()
+        elif len(dq['Site ID']) == 3: 
+            tiga ()
+
+dafi = pd.DataFrame(data,columns=heder)
+# dafi.to_excel(r'D:\Parsing\latihan.xlsx',index=False)
+print(dafi)
