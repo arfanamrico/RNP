@@ -1,0 +1,122 @@
+import pandas as pd
+
+path = r"D:\TSEL\MCOM_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024.xlsx"
+inven = r"D:\TSEL\filepelengkap\inventory.xlsx"
+
+##=============MCOM=====================
+heder = ['VENDOR','Site ID','NE ID','Site_Name','Legend','Existing-Band','Longitude','Latitude','Rsite','Tower Height','Antenna Height ','Dir','Ant_Type','Antena Remark','Antenna Port','Cell_Type','dlChannelBandwidth','earfcndl','configuredMaxTxPower','Duplex Type','TypeDU','Type RRU','Freq Band','Sector']
+lissite = ['BKG749']
+data = []
+df = pd.read_excel(path)
+df = pd.DataFrame(df)
+mcom = df[['VENDOR','Site ID','NE ID','Site_Name','Longitude','Latitude','Rsite','Tower Height','Antenna Height ','Dir','Ant_Type','Antena Remark','Antenna Port','Cell_Type','dlChannelBandwidth','earfcndl','configuredMaxTxPower','Duplex Type','TypeDU','Type RRU','Freq Band','Legend','Sector']]
+
+def satu ():
+        try:
+            vendor,siteid,neid,sitename,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,legend,sec = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Rsite'],dq.loc[0,'Tower Height'],dq.loc[0,'Antenna Height '],dq.loc[0,'Dir'],dq.loc[0,'Ant_Type'],dq.loc[0,'Antena Remark'],dq.loc[0,'Antenna Port'],dq.loc[0,'Cell_Type'],dq.loc[0,'dlChannelBandwidth'],dq.loc[0,'earfcndl'],dq.loc[0,'configuredMaxTxPower'],dq.loc[0,'Duplex Type'],dq.loc[0,'TypeDU'],dq.loc[0,'Type RRU'],dq.loc[0,'Freq Band'],dq.loc[0,'Legend'],dq.loc[0,'Sector']
+            data.append([vendor,siteid,neid,sitename,legend,eb,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,sec])
+        except:pass
+def dua ():
+        try:
+            vendor,siteid,neid,sitename,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,legend,sec = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Rsite'],dq.loc[0,'Tower Height'],f'{dq.loc[0,'Antenna Height ']}/{dq.loc[1,'Antenna Height ']}',f'{dq.loc[0,'Dir']}/{dq.loc[1,'Dir']}',f'{dq.loc[0,'Ant_Type']}/{dq.loc[1,'Ant_Type']}',dq.loc[0,'Antena Remark'],f'{dq.loc[0,'Antenna Port']}/{dq.loc[1,'Antenna Port']}',dq.loc[0,'Cell_Type'],dq.loc[0,'dlChannelBandwidth'],dq.loc[0,'earfcndl'],dq.loc[0,'configuredMaxTxPower'],dq.loc[0,'Duplex Type'],f'{dq.loc[0,'TypeDU']}/{dq.loc[1,'TypeDU']}',f'{dq.loc[0,'Type RRU']}/{dq.loc[1,'Type RRU']}',dq.loc[0,'Freq Band'],dq.loc[0,'Legend'],f'{dq.loc[0,'Sector']}/{dq.loc[1,'Sector']}'
+            data.append([vendor,siteid,neid,sitename,legend,eb,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,sec])
+        except:pass
+def tiga ():
+        try:
+            vendor,siteid,neid,sitename,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,legend,sec = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Rsite'],dq.loc[0,'Tower Height'],f'{dq.loc[0,'Antenna Height ']}/{dq.loc[1,'Antenna Height ']}/{dq.loc[2,'Antenna Height ']}',f'{dq.loc[0,'Dir']}/{dq.loc[1,'Dir']}/{dq.loc[2,'Dir']}',f'1.{dq.loc[0,'Ant_Type']}/2.{dq.loc[1,'Ant_Type']}/3.{dq.loc[2,'Ant_Type']}',dq.loc[0,'Antena Remark'],f'{dq.loc[0,'Antenna Port']}/{dq.loc[1,'Antenna Port']}/{dq.loc[2,'Antenna Port']}',dq.loc[0,'Cell_Type'],dq.loc[0,'dlChannelBandwidth'],dq.loc[0,'earfcndl'],dq.loc[0,'configuredMaxTxPower'],dq.loc[0,'Duplex Type'],f'{dq.loc[0,'TypeDU']}/{dq.loc[1,'TypeDU']}/{dq.loc[2,'TypeDU']}',f'{dq.loc[0,'Type RRU']}/{dq.loc[1,'Type RRU']}/{dq.loc[2,'Type RRU']}',dq.loc[0,'Freq Band'],dq.loc[0,'Legend'],f'{dq.loc[0,'Sector']}/{dq.loc[1,'Sector']}/{dq.loc[2,'Sector']}'
+            data.append([vendor,siteid,neid,sitename,legend,eb,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,sec])
+        except:pass
+def empat ():
+        try:
+            vendor,siteid,neid,sitename,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,legend,sec = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Rsite'],dq.loc[0,'Tower Height'],f'{dq.loc[0,'Antenna Height ']}/{dq.loc[1,'Antenna Height ']}/{dq.loc[2,'Antenna Height ']}/{dq.loc[3,'Antenna Height ']}',f'{dq.loc[0,'Dir']}/{dq.loc[1,'Dir']}/{dq.loc[2,'Dir']}/{dq.loc[3,'Dir']}',f'1.{dq.loc[0,'Ant_Type']}/2.{dq.loc[1,'Ant_Type']}/3.{dq.loc[2,'Ant_Type']}/4.{dq.loc[3,'Ant_Type']}',dq.loc[0,'Antena Remark'],f'{dq.loc[0,'Antenna Port']}/{dq.loc[1,'Antenna Port']}/{dq.loc[2,'Antenna Port']}/{dq.loc[3,'Antenna Port']}',dq.loc[0,'Cell_Type'],dq.loc[0,'dlChannelBandwidth'],dq.loc[0,'earfcndl'],dq.loc[0,'configuredMaxTxPower'],dq.loc[0,'Duplex Type'],f'{dq.loc[0,'TypeDU']}/{dq.loc[1,'TypeDU']}/{dq.loc[2,'TypeDU']}/{dq.loc[3,'TypeDU']}',f'{dq.loc[0,'Type RRU']}/{dq.loc[1,'Type RRU']}/{dq.loc[2,'Type RRU']}/{dq.loc[3,'Type RRU']}',dq.loc[0,'Freq Band'],dq.loc[0,'Legend'],f'{dq.loc[0,'Sector']}/{dq.loc[1,'Sector']}/{dq.loc[2,'Sector']}/{dq.loc[3,'Sector']}'
+            data.append([vendor,siteid,neid,sitename,legend,eb,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,sec])
+        except:pass
+def lima ():
+        try:
+            vendor,siteid,neid,sitename,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,legend,sec = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Rsite'],dq.loc[0,'Tower Height'],f'{dq.loc[0,'Antenna Height ']}/{dq.loc[1,'Antenna Height ']}/{dq.loc[2,'Antenna Height ']}/{dq.loc[3,'Antenna Height ']}/{dq.loc[4,'Antenna Height ']}',f'{dq.loc[0,'Dir']}/{dq.loc[1,'Dir']}/{dq.loc[2,'Dir']}/{dq.loc[3,'Dir']}/{dq.loc[4,'Dir']}',f'{dq.loc[0,'Ant_Type']}/{dq.loc[1,'Ant_Type']}/{dq.loc[2,'Ant_Type']}/{dq.loc[3,'Ant_Type']}/{dq.loc[4,'Ant_Type']}',dq.loc[0,'Antena Remark'],f'{dq.loc[0,'Antenna Port']}/{dq.loc[1,'Antenna Port']}/{dq.loc[2,'Antenna Port']}/{dq.loc[3,'Antenna Port']}/{dq.loc[4,'Antenna Port']}',dq.loc[0,'Cell_Type'],dq.loc[0,'dlChannelBandwidth'],dq.loc[0,'earfcndl'],dq.loc[0,'configuredMaxTxPower'],dq.loc[0,'Duplex Type'],f'{dq.loc[0,'TypeDU']}/{dq.loc[1,'TypeDU']}/{dq.loc[2,'TypeDU']}/{dq.loc[3,'TypeDU']}/{dq.loc[4,'TypeDU']}',f'{dq.loc[0,'Type RRU']}/{dq.loc[1,'Type RRU']}/{dq.loc[2,'Type RRU']}/{dq.loc[3,'Type RRU']}/{dq.loc[4,'Type RRU']}',dq.loc[0,'Freq Band'],dq.loc[0,'Legend'],f'{dq.loc[0,'Sector']}/{dq.loc[1,'Sector']}/{dq.loc[2,'Sector']}/{dq.loc[3,'Sector']}/{dq.loc[4,'Sector']}'
+            data.append([vendor,siteid,neid,sitename,legend,eb,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,sec])
+        except:pass
+def enam ():
+        try:
+            vendor,siteid,neid,sitename,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,legend,sec = dq.loc[0,'VENDOR'],dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Rsite'],dq.loc[0,'Tower Height'],f'{dq.loc[0,'Antenna Height ']}/{dq.loc[1,'Antenna Height ']}/{dq.loc[2,'Antenna Height ']}/{dq.loc[3,'Antenna Height ']}/{dq.loc[4,'Antenna Height ']}/{dq.loc[5,'Antenna Height ']}',f'{dq.loc[0,'Dir']}/{dq.loc[1,'Dir']}/{dq.loc[2,'Dir']}/{dq.loc[3,'Dir']}/{dq.loc[4,'Dir']}/{dq.loc[5,'Dir']}',f'1.{dq.loc[0,'Ant_Type']}/2.{dq.loc[1,'Ant_Type']}/3.{dq.loc[2,'Ant_Type']}/4.{dq.loc[3,'Ant_Type']}/5.{dq.loc[4,'Ant_Type']}/6.{dq.loc[5,'Ant_Type']}',dq.loc[0,'Antena Remark'],f'{dq.loc[0,'Antenna Port']}/{dq.loc[1,'Antenna Port']}/{dq.loc[2,'Antenna Port']}/{dq.loc[3,'Antenna Port']}/{dq.loc[4,'Antenna Port']}/{dq.loc[5,'Antenna Port']}',dq.loc[0,'Cell_Type'],dq.loc[0,'dlChannelBandwidth'],dq.loc[0,'earfcndl'],dq.loc[0,'configuredMaxTxPower'],dq.loc[0,'Duplex Type'],f'{dq.loc[0,'TypeDU']}/{dq.loc[1,'TypeDU']}/{dq.loc[2,'TypeDU']}/{dq.loc[3,'TypeDU']}/{dq.loc[4,'TypeDU']}/{dq.loc[5,'TypeDU']}',f'{dq.loc[0,'Type RRU']}/{dq.loc[1,'Type RRU']}/{dq.loc[2,'Type RRU']}/{dq.loc[3,'Type RRU']}/{dq.loc[4,'Type RRU']}/{dq.loc[5,'Type RRU']}',dq.loc[0,'Freq Band'],dq.loc[0,'Legend'],f'{dq.loc[0,'Sector']}/{dq.loc[1,'Sector']}/{dq.loc[2,'Sector']}/{dq.loc[3,'Sector']}/{dq.loc[4,'Sector']}/{dq.loc[5,'Sector']}'
+            data.append([vendor,siteid,neid,sitename,legend,eb,longitude,latitude,rsite,towerheight,antennaheight,dir,anttype,antenaremark,antennaport,celltype,dlchannelbandwidth,earfcndl,configuredmaxtxpower,duplextype,typedu,typerru,freqband,sec])
+        except:pass
+
+for s in lissite:
+    ds = mcom[mcom['Site ID'] == s]
+    lisduplek = set(ds['Duplex Type'])
+    existband = set(ds['Legend'])
+    eb = ''
+    for b in existband:
+         eb = f'{eb}/{b}'
+    for d in lisduplek:
+        if d == 'TDD':
+            dd = ds[ds['Duplex Type'] == d]
+            dd['Freq Band'] = dd['Freq Band'].str[-3:-1]
+            ddf = dd[dd['Freq Band'] == 'F1']
+            # print(ddf['Freq Band'])
+            lisband = set(ddf['Legend'])
+            for band in lisband:
+                dq = ddf[ddf['Legend'] == band].reset_index()
+                if len(dq['Site ID']) == 1: 
+                    satu ()
+                elif len(dq['Site ID']) == 2: 
+                    dua ()
+                elif len(dq['Site ID']) == 3: 
+                    tiga ()
+                elif len(dq['Site ID']) == 4: 
+                    empat ()
+                elif len(dq['Site ID']) == 5: 
+                    lima ()
+                elif len(dq['Site ID']) == 6: 
+                    enam ()
+        elif d == 'FDD':
+            lisband = set(ds['Legend'])
+            for band in lisband:
+                dq = ds[ds['Legend'] == band].reset_index()
+                if len(dq['Site ID']) == 1: 
+                    satu ()
+                elif len(dq['Site ID']) == 2: 
+                    dua ()
+                elif len(dq['Site ID']) == 3: 
+                    tiga ()
+                elif len(dq['Site ID']) == 4: 
+                    empat ()
+                elif len(dq['Site ID']) == 5: 
+                    lima ()
+                elif len(dq['Site ID']) == 6: 
+                    enam ()
+
+dafi = pd.DataFrame(data,columns=heder)
+##==========================================
+#=======Pivot CELL=================
+dfcell = pd.read_excel(inven,sheet_name='CELL')
+dfcell = pd.DataFrame(dfcell)
+dfcell['Site ID'] = dfcell['NENAME'].str[2:8]
+cell = dfcell.pivot_table(values='Local Cell ID',index='Site ID',columns='Cell transmission and reception mode',aggfunc='count').reset_index()
+##=======Pivot RRU=================
+dfrru = pd.read_excel(inven,sheet_name='RRU')
+dfrru = pd.DataFrame(dfrru)
+dfrru['Site ID'] = dfrru['NEName'].str[2:8]
+rru = dfrru.pivot_table(values='NEType',index='Site ID',columns='Convert RRU.Type Board',aggfunc='count').reset_index()
+#=======pivot UBBP========================
+dfubbp = pd.read_excel(inven,sheet_name='UBBP')
+dfubbp = pd.DataFrame(dfubbp)
+dfubbp['Site ID'] = dfubbp['NEName'].str[2:8]
+ubbp = dfubbp.pivot_table(values='NEType',index='Site ID',columns='Convert UBBP',aggfunc='count').reset_index()
+#========pivot UMPT================================
+dfumpt = pd.read_excel(inven,sheet_name='UMPT')
+dfumpt = pd.DataFrame(dfumpt)
+dfumpt['Site ID'] = dfumpt['NEName'].str[2:8]
+umpt = dfumpt[['Site ID','NEName','convert']]
+# umpt = dfumpt.pivot_table(values='NEType',index='Site ID',columns='convert',aggfunc='count').reset_index()
+#===================================================
+sitelist = pd.merge(ubbp,cell, on='Site ID', how='left')
+sitelist = pd.merge(umpt,sitelist, on='Site ID', how='left')
+sitelist = pd.merge(sitelist,rru, on='Site ID', how='left')
+sitfil = sitelist[sitelist['Site ID'].isin(lissite)]
+sitfil.rename(columns={'convert':'UMPT'},inplace=True)
+
+asses = pd.merge(dafi,sitfil, on='Site ID', how='left')
+asses.to_excel(r'D:\Parsing\assesment.xlsx',index=False)
+print(asses)
