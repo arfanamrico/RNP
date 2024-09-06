@@ -1,0 +1,92 @@
+import pandas as pd
+
+
+filename = 'IRR.xlsx'
+pelengkap = r"D:\TSEL\filepelengkap\pelengkap_IRR.xlsx"
+dirpath = r"D:\TSEL\MCOM_TSEL_W30_2024\MCOM_R10_4G_TSEL_W30_2024\MCOM_R10_4G_TSEL_W30_2024.xlsx"
+head_IRR = ['ID_UNIK','JPP','PLAN_CAPEX_PAPER','AREA','REGION','VENDOR','SITE_ID','NE_ID','SITE_NAME','LONG','LAT','SYSTEM','BAND','BTS_TYPE','SECTOR','BANDWIDTH','OBJECTIVE','PROGRAM_CAPEX','SOW_EQP','REG_REV_PREDICTION','TARGET_ON_AIR_MONTH','INFRA_TYPE','PLAN_ORDER_INFRA','PLAN_TOWER_PROVIDER','ANTENA_HEIGHT','ANTENA_TYPE','POWER_SOURCE','SOW_PS','TRANSPORT_TYPE','SOW_TRANSPORT','REG_CAPEX','OPEX_MANDATORY','SITE_ID_DONOR','SECTOR_DONOR','RELOCATION_TYPE','REMARKS','MANDATORY_FLAG','MANDATORY_FLAG_2','RADIO_QTY','SCOPE_RADIO','BASEBAND_QTY','SCOPE_BASEBAND','CAPEX_EQP','CAPEX_PS','OBJECTIVE_REGION','OBJECTIVE_HQ','REMARK SOW','Noted SOW','Objective SOW','Remarks']
+heder = ['VENDOR','SITE_ID','NE_ID','SITE_NAME','LONG','LAT','BAND','BTS_TYPE','SECTOR','ANTENA_HEIGHT','ANTENA_TYPE']
+data = []
+siteid = '421D230E'
+#=================
+dp = pd.read_excel(pelengkap)
+dp = pd.DataFrame(dp)
+dp = dp.fillna('-')
+idunik = dp.loc[0,'ID_UNIK']
+jpp = dp.loc[0,'JPP']
+plancap = dp.loc[0,'PLAN_CAPEX_PAPER']
+area = dp.loc[0,'AREA']
+region = dp.loc[0,'REGION']
+vendor = dp.loc[0,'VENDOR']
+system = dp.loc[0,'SYSTEM']
+bandwidth = dp.loc[0,'BANDWIDTH']
+objective = dp.loc[0,'OBJECTIVE']
+programcapex = dp.loc[0,'PROGRAM_CAPEX']
+soweqp = dp.loc[0,'SOW_EQP']
+regprediction = dp.loc[0,'REG_REV_PREDICTION']
+targetmonth = dp.loc[0,'TARGET_ON_AIR_MONTH']
+infratype = dp.loc[0,'INFRA_TYPE']
+planinfra = dp.loc[0,'PLAN_ORDER_INFRA']
+planprovider = dp.loc[0,'PLAN_TOWER_PROVIDER']
+powersource = dp.loc[0,'POWER_SOURCE']
+sowps = dp.loc[0,'SOW_PS']
+transporttype = dp.loc[0,'TRANSPORT_TYPE']
+sowtransport = dp.loc[0,'SOW_TRANSPORT']
+regcapex = dp.loc[0,'REG_CAPEX']
+opexmandatory = dp.loc[0,'OPEX_MANDATORY']
+sitedonor = dp.loc[0,'SITE_ID_DONOR']
+sectordonor = dp.loc[0,'SECTOR_DONOR']
+relocationtype = dp.loc[0,'RELOCATION_TYPE']
+remarks = dp.loc[0,'REMARKS']
+mandatoryflag = dp.loc[0,'MANDATORY_FLAG']
+mandatory2 = dp.loc[0,'MANDATORY_FLAG_2']
+radioqty = dp.loc[0,'RADIO_QTY']
+scoperadio = dp.loc[0,'SCOPE_RADIO']
+basebandqty = dp.loc[0,'BASEBAND_QTY']
+scopebaseband = dp.loc[0,'SCOPE_BASEBAND']
+capexeqp = dp.loc[0,'CAPEX_EQP']
+capexps = dp.loc[0,'CAPEX_PS']
+objectiveregion = dp.loc[0,'OBJECTIVE_REGION']
+objectivehq = dp.loc[0,'OBJECTIVE_HQ']
+remsow = dp.loc[0,'REMARK SOW']
+notsow = dp.loc[0,'Noted SOW']
+objsow = dp.loc[0,'Objective SOW']
+remarks = dp.loc[0,'Remarks']
+
+#====================
+df = pd.read_excel(dirpath)
+df = pd.DataFrame(df)
+df = df[['Site ID','NE ID','Site_Name','Longitude','Latitude','Legend','Cell_Type','Sector','Antenna Height ','Ant_Type']]
+# lissite = set(df['Site ID'])
+lissite = ['BKG302'] ## ===> site yg dibuat IRR nya
+# df['Site ID'] =  df['eNodeB Name'].str.split('_').str[0]
+
+def satu ():
+        SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE = dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}',dq.loc[0,'Antenna Height '],dq.loc[0,'Ant_Type']
+        data.append([idunik,jpp,plancap,area,region,vendor,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,system,BAND,BTS_TYPE,SECTOR,bandwidth,objective,programcapex,soweqp,regprediction,targetmonth,infratype,planinfra,planprovider,ANTENA_HEIGHT,ANTENA_TYPE,powersource,sowps,transporttype,sowtransport,regcapex,opexmandatory,sitedonor,sectordonor,relocationtype,remarks,mandatoryflag,mandatory2,radioqty,scoperadio,basebandqty,scopebaseband,capexeqp,capexps,objectiveregion,objectivehq,remsow,notsow,objsow,remarks])
+def dua ():
+    try:
+        SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE = dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}_{dq.loc[1,'Sector']}',dq.loc[0,'Antenna Height '],dq.loc[0,'Ant_Type']
+        data.append([idunik,jpp,plancap,area,region,vendor,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,system,BAND,BTS_TYPE,SECTOR,bandwidth,objective,programcapex,soweqp,regprediction,targetmonth,infratype,planinfra,planprovider,ANTENA_HEIGHT,ANTENA_TYPE,powersource,sowps,transporttype,sowtransport,regcapex,opexmandatory,sitedonor,sectordonor,relocationtype,remarks,mandatoryflag,mandatory2,radioqty,scoperadio,basebandqty,scopebaseband,capexeqp,capexps,objectiveregion,objectivehq,remsow,notsow,objsow,remarks])
+    except:pass
+def tiga ():
+    try:
+        SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,ANTENA_HEIGHT,ANTENA_TYPE = dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}_{dq.loc[1,'Sector']}_{dq.loc[2,'Sector']}',dq.loc[0,'Antenna Height '],dq.loc[0,'Ant_Type']
+        data.append([idunik,jpp,plancap,area,region,vendor,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,system,BAND,BTS_TYPE,SECTOR,bandwidth,objective,programcapex,soweqp,regprediction,targetmonth,infratype,planinfra,planprovider,ANTENA_HEIGHT,ANTENA_TYPE,powersource,sowps,transporttype,sowtransport,regcapex,opexmandatory,sitedonor,sectordonor,relocationtype,remarks,mandatoryflag,mandatory2,radioqty,scoperadio,basebandqty,scopebaseband,capexeqp,capexps,objectiveregion,objectivehq,remsow,notsow,objsow,remarks])
+    except:pass
+
+for s in lissite:
+    ds = df[df['Site ID'] == s]
+    lisband = set(ds['Legend'])
+    for band in lisband:
+        dq = ds[ds['Legend'] == band].reset_index()
+        if len(dq['Site ID']) == 1: 
+            satu ()
+        elif len(dq['Site ID']) == 2: 
+            dua ()
+        elif len(dq['Site ID']) == 3: 
+            tiga ()
+
+dafi = pd.DataFrame(data,columns=head_IRR)
+# dafi.to_excel(r'D:\Parsing\latihanIRR.xlsx',index=False)
+print(dafi)
