@@ -1,0 +1,54 @@
+import pandas as pd
+
+mcom = r"D:\TSEL\MCOM_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024.xlsx"
+
+# ##=============================
+target = ['BSK007','BSK014']#,'BKG160','BKG871','BLS676','BSK007','BSK014'
+dirpath = r'D:\TSEL\RCI'
+namafile = 'antenna perband.xlsx'
+hedperband = ['Site ID','Sector','Antenna Port','Ant_L1800','Ant_L2100','Ant_L2300','Ant_L900']
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+# dmcom['SiteID-Sector'] = dmcom['Site ID'].astype(str)+"_"+dmcom['Sector'].astype(str)
+dmcom = dmcom[dmcom['Cell_Type']=='Macro'].reset_index()
+dante = dmcom[['Site ID','Sector','Antenna Port','Ant_Type','Freq Band','Legend']]
+dant = dante[dante['Site ID'].isin(target)]
+# lisantperband = set(dante['Site ID'].to_list())
+data = []
+# for site in lisantperband:
+# dant = dante[dante['Site ID']== site].reset_index()
+lissec = set(dant['Sector'])
+for n in lissec:
+    dan = dant[dant['Sector']== n].reset_index()
+    lisband = ['L1800','L2100','L2300','L900']
+    l18=l21=l23=l90='-'
+    for lb in lisband:
+      if lb == 'L1800':
+        das = dan[dan['Legend']==lb].reset_index()
+        ns = len(das['Sector'])
+        if ns == 1 : l18 = f'{das.loc[0,'Ant_Type']}'
+        elif ns == 2 : l18 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+        elif ns == 3 : l18 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+      elif lb == 'L2100':
+        das = dan[dan['Legend']==lb].reset_index()
+        ns = len(das['Sector'])
+        if ns == 1 : l21 = f'{das.loc[0,'Ant_Type']}'
+        elif ns == 2 : l21 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+        elif ns == 3 : l21 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+      elif lb == 'L2300':
+        das = dan[dan['Legend']==lb].reset_index()
+        ns = len(das['Sector'])
+        if ns == 1 : l23 = f'{das.loc[0,'Ant_Type']}'
+        elif ns == 2 : l23 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+        elif ns == 3 : l23 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+      elif lb == 'L900':
+        das = dan[dan['Legend']==lb].reset_index()
+        ns = len(das['Sector'])
+        if ns == 1 : l90 = f'{das.loc[0,'Ant_Type']}'
+        elif ns == 2 : l90 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+        elif ns == 3 : l90 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+    data.append([dan.loc[0,'Site ID'],n,dan.loc[0,'Antenna Port'],l18,l21,l23,l90])       
+            
+antperband = pd.DataFrame(data,columns=hedperband)
+antperband.to_excel(f'{dirpath}/{namafile}',index=False)
+print(antperband)        
