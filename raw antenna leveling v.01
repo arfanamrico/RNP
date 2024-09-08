@@ -1,0 +1,37 @@
+import pandas as pd
+
+mcom = r"D:\TSEL\MCOM_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024.xlsx"
+pat = r"D:\TSEL\RCI\rawantennaleveling.xlsx"
+dirpath = r'D:\TSEL\RCI'
+target = [202434,202433,202432,202431]
+namafile = 'data_antennaleveling.xlsx'
+
+df = pd.read_excel(pat)
+df = pd.DataFrame(df)
+
+df['SiteID-Sector'] = df['site_id'].astype(str)+"_"+df['sector_id'].astype(str)
+datf = df[df['week'].isin(target)]
+pvtprb = datf.pivot_table(index='SiteID-Sector',columns=['week','band'],values='prb_util_cell',aggfunc='mean').reset_index()
+pvtprb = pvtprb.fillna(0)
+# pvtprb.to_excel(f'{dirpath}/{namafile}')
+##=============================
+pvtedg = datf.pivot_table(index='SiteID-Sector',columns=['week','band'],values='edge_coverage',aggfunc='max').reset_index()
+pvtedg = pvtedg.fillna(0)
+##=============================
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+dmcom['SiteID-Sector'] = dmcom['Site ID'].astype(str)+"_"+dmcom['Sector'].astype(str)
+danth = dmcom[['SiteID-Sector','Antenna Height ','Legend']]
+pvanth = danth.pivot_table(values='Antenna Height ', index='SiteID-Sector', columns='Legend', aggfunc='sum').reset_index()
+##=========================================
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+dath = dmcom[['Site ID','Tower Height']]
+pvth = dath.groupby(by=['Site ID'], as_index=False).agg({'Tower Height':'min'})  #['Tower Height'].min()
+##========================================
+writer = pd.ExcelWriter(f'{dirpath}/{namafile}',engine='xlsxwriter')
+pvtprb.to_excel(writer,sheet_name='prb_util_cell')
+pvtedg.to_excel(writer,sheet_name='edge_coverage')
+pvanth.to_excel(writer,index=False,sheet_name='antenna_high')
+pvth.to_excel(writer,index=False,sheet_name='Tower_high')
+writer.close()
