@@ -23,6 +23,7 @@ for site in lisantperband:
   eb = ''
   for b in existband:
     eb = f'{eb}/{b}'
+  eb = eb.replace('/','',1)
   lisband = ['L1800','L2100','L2300','L900']
   l18=l21=l23=l90='-'
   for lb in lisband:
@@ -34,6 +35,7 @@ for site in lisantperband:
       l18 = ''
       for k,v in numant.items():
         l18 = f'{l18}/{v}*{k}'
+      l18 = l18.replace('/','',1)
       # lispo = set(das['Antenna Port'])
       # numpo = Counter(lispo)
       # pol18 = ''
@@ -47,6 +49,7 @@ for site in lisantperband:
       l21 = ''
       for k,v in numant.items():
         l21 = f'{l21}/{v}*{k}'
+      l21 = l21.replace('/','',1)
     elif lb == 'L2300':
       das = dant[dant['Legend']==lb]#.reset_index()
       listyp = das['Ant_Type'].to_list()
@@ -55,6 +58,7 @@ for site in lisantperband:
       l23 = ''
       for k,v in numant.items():
         l23 = f'{l23}/{v}*{k}'
+      l23 = l23.replace('/','',1)
     elif lb == 'L900':
       das = dant[dant['Legend']==lb]#.reset_index()
       listyp = das['Ant_Type'].to_list()
@@ -63,7 +67,8 @@ for site in lisantperband:
       l90 = ''
       for k,v in numant.items():
         l90 = f'{l90}/{v}*{k}'
+      l90 = l90.replace('/','',1)
   data.append([dant.loc[0,'VENDOR'],dant.loc[0,'Site ID'],eb,l18,l21,l23,l90])     
 sitelevel = pd.DataFrame(data,columns=hedperband)
-sitelevel.to_excel(f'{dirpath}/{namafile}',index=False)
+# sitelevel.to_excel(f'{dirpath}/{namafile}',index=False)
 print(sitelevel)  
