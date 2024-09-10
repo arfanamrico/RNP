@@ -1,0 +1,69 @@
+import pandas as pd
+from collections import Counter
+
+mcom = r"D:\TSEL\MCOM_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024\MCOM_R10_4G_TSEL_W34_2024.xlsx"
+
+# ##=============================
+# lisantperband = ['BKG160','BKG871','BLS676','BSK007','BSK014']#,'BKG160','BKG871','BLS676','BSK007','BSK014'
+dirpath = r'D:\TSEL\RCI'
+namafile = 'type antenna persite.xlsx'
+hedperband = ['VENDOR','Site ID','Band','Ant_L1800','Ant_L2100','Ant_L2300','Ant_L900']
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+# dmcom['SiteID-Sector'] = dmcom['Site ID'].astype(str)+"_"+dmcom['Sector'].astype(str)
+dmcom = dmcom[dmcom['Cell_Type']=='Macro'].reset_index()
+dante = dmcom[['VENDOR','Site ID','Antenna Port','Ant_Type','Legend']]
+# dant = dante[dante['Site ID'].isin(target)]
+lisantperband = ['ASK008','ASK009','ASK010','ASK011','ASK012','ASK013','ASK014']
+# lisantperband = set(dante['Site ID']) #mengambil semua sitelist dalam MCOM
+data = []
+for site in lisantperband:
+  dant = dante[dante['Site ID']== site].reset_index()
+  existband = set(dant['Legend'])
+  eb = ''
+  for b in existband:
+    eb = f'{eb}/{b}'
+  lisband = ['L1800','L2100','L2300','L900']
+  l18=l21=l23=l90='-'
+  for lb in lisband:
+    if lb == 'L1800':
+      das = dant[dant['Legend']==lb]#.reset_index()
+      listyp = das['Ant_Type'].to_list()
+      numant = Counter(listyp)
+      # print(f'{lb}: {numant}')
+      l18 = ''
+      for k,v in numant.items():
+        l18 = f'{l18}/{v}*{k}'
+      # lispo = set(das['Antenna Port'])
+      # numpo = Counter(lispo)
+      # pol18 = ''
+      # for k,v in numpo.items():
+      #   pol18 = f'{pol18}/{v}*{k}'
+    elif lb == 'L2100':
+      das = dant[dant['Legend']==lb]#.reset_index()
+      listyp = das['Ant_Type'].to_list()
+      numant = Counter(listyp)
+      # print(f'{lb}: {numant}')
+      l21 = ''
+      for k,v in numant.items():
+        l21 = f'{l21}/{v}*{k}'
+    elif lb == 'L2300':
+      das = dant[dant['Legend']==lb]#.reset_index()
+      listyp = das['Ant_Type'].to_list()
+      numant = Counter(listyp)
+      # print(f'{lb}: {numant}')
+      l23 = ''
+      for k,v in numant.items():
+        l23 = f'{l23}/{v}*{k}'
+    elif lb == 'L900':
+      das = dant[dant['Legend']==lb]#.reset_index()
+      listyp = das['Ant_Type'].to_list()
+      numant = Counter(listyp)
+      # print(f'{lb}: {numant}')
+      l90 = ''
+      for k,v in numant.items():
+        l90 = f'{l90}/{v}*{k}'
+  data.append([dant.loc[0,'VENDOR'],dant.loc[0,'Site ID'],eb,l18,l21,l23,l90])     
+sitelevel = pd.DataFrame(data,columns=hedperband)
+sitelevel.to_excel(f'{dirpath}/{namafile}',index=False)
+print(sitelevel)  
