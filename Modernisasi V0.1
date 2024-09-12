@@ -1,0 +1,178 @@
+import pandas as pd
+import os
+import time
+start_time = time.time()
+
+dirpath = r'D:\TSEL\RCI'  #=====tempat menyimpan file=========
+portant = r"D:\TSEL\Inventory\Port type antenna.xlsx"
+portdf = pd.read_excel(portant)
+portdf = pd.DataFrame(portdf)
+##=================Gcell Input=================
+mcom = r"D:\TSEL\MCOM_TSEL_W35_2024\MCOM_R10_4G_TSEL_W35_2024\MCOM_R10_4G_TSEL_W35_2024.xlsx"
+df = pd.read_excel(mcom)
+df = pd.DataFrame(df)
+df['sek'] = df['EUtranCell'].str[-1]
+df['Unique-1'] = df['Site ID']+"_"+df['sek']+"_"+df['Legend']
+df['Unique-2'] = df['Site ID']+"_"+df['Legend']
+df['Antena Type-2'] = df['Ant_Type']
+df = df[['Unique-1','Unique-2','Site ID','sek','Legend','Antenna Height ','Ant_Type','Antena Type-2']]
+gcell_input = pd.merge(df,portdf,on='Ant_Type',how='left')
+# print(gcell_input)
+##============Sector===========
+datsector = []
+hedsector = ['Site ID','Sector ID','Band_System','Site ID_Sector ID','Total Ant','L900','L1800','L2100','L2300','Unique-1','ASI/APE/A12','port_sat']
+sec = gcell_input[['Unique-1','Site ID','sek','Legend','Ant_Type','port_sat']]
+# lisite = ['ASK006','ASK007','ASK008','ASK009','ASK010','ASK011','ASK012','ASK013','ASK014','ASK015','ASK016','ASK017','ASK018','ASK019','ASK020']
+lisite = set(sec['Site ID'])
+for s in lisite:
+    sect = sec[sec['Site ID']== s].reset_index()
+    lisec = set(sect['sek'])
+    for se in lisec:
+        secto = sect[sect['sek']== se]
+        totalant = len(set(secto['Ant_Type']))
+        exband = set(secto['Legend'])
+        eb = ''
+        for b in exband:
+            eb = f'{eb}/{b}'
+        eb = eb.replace('/','',1)
+        lisband = ['L900','L1800','L2100','L2300']
+        l18=l21=l23=l90='-'
+        for lb in lisband:
+            try:
+                if lb == 'L900':
+                    sector = secto[secto['Legend']==lb].reset_index()
+                    l90 = sector.loc[0,'Ant_Type']
+                elif lb == 'L1800':
+                    sector = secto[secto['Legend']==lb].reset_index()
+                    l18 = sector.loc[0,'Ant_Type']
+                elif lb == 'L2100':
+                    sector = secto[secto['Legend']==lb].reset_index()
+                    l21 = sector.loc[0,'Ant_Type']
+                elif lb == 'L2300':
+                    sector = secto[secto['Legend']==lb].reset_index()
+                    l23 = sector.loc[0,'Ant_Type']
+            except:pass
+        datsector.append([s,se,eb,f'{s}_{se}',totalant,l90,l18,l21,l23,f'{s}_{se}',f'{l90}/{l18}/{l21}/{l23}',sect.loc[0,'port_sat']])
+rawsector = pd.DataFrame(datsector,columns=hedsector)
+# rawsector.to_excel(f'{dirpath}/antennaconventer.xlsx',index=False)
+# print(rawsector)
+###=============Site=========================
+summarysite = []
+hedersummary = ['Site ID','Total Antenna','ant_sec1','ant_sec2','ant_sec3','ant_sec4','ant_sec5','ant_sec6','ant_sec7','ant_sec8','ant_sec9','10/12-port-sec1','10/12-port-sec2','10/12-port-sec3','10/12-port-sec4','10/12-port-sec5','10/12-port-sec6','10/12-port-sec7','10/12-port-sec8','10/12-port-sec9','NON10/12-port-sec1','NON10/12-port-sec2','NON10/12-port-sec3']
+site = gcell_input[['Site ID','sek','Ant_Type','port_sat']]
+site.loc[site['port_sat']>=10, '10/12-port'] = 'YES'
+site.loc[site['port_sat']< 10, '10/12-port'] = 'NO'
+site.loc[site['port_sat']< 10, 'NON10/12-port'] = 'YES'
+site.loc[site['port_sat']>= 10, 'NON10/12-port'] = 'NO'
+# lisite = ['ASK006','ASK007','ASK008','ASK009','ASK010','ASK011','ASK012','ASK013','ASK014','ASK015','ASK016','ASK017','ASK018','ASK019','ASK020']
+for s in lisite:
+    dsite = site[site['Site ID']==s]
+    # print(dsite)
+    # total_ant = len(set(dsite['Ant_Type']))
+    jmlantsec1=jmlantsec2=jmlantsec3=jmlantsec4=jmlantsec5=jmlantsec6=jmlantsec7=jmlantsec8=jmlantsec9=0
+    lisec = [1,2,3,4,5,6,7,8,9]
+    for se in lisec:
+        if se == 1:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec1 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec1port10 = 'YES'
+            else: sec1port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec1portkecil10 = 'YES'
+            else: sec1portkecil10 = 'NO'
+        elif se == 2:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec2 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec2port10 = 'YES'
+            else: sec2port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec2portkecil10 = 'YES'
+            else: sec2portkecil10 = 'NO'
+        elif se == 3:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec3 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec3port10 = 'YES'
+            else: sec3port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec3portkecil10 = 'YES'
+            else: sec3portkecil10 = 'NO'
+        elif se == 4:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec4 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec4port10 = 'YES'
+            else: sec4port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec4portkecil10 = 'YES'
+            else: sec4portkecil10 = 'NO'
+        elif se == 5:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec5 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec5port10 = 'YES'
+            else: sec5port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec5portkecil10 = 'YES'
+            else: sec5portkecil10 = 'NO'
+        elif se == 6:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec6 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec6port10 = 'YES'
+            else: sec6port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec6portkecil10 = 'YES'
+            else: sec6portkecil10 = 'NO'
+        elif se == 7:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec7 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec7port10 = 'YES'
+            else: sec7port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec7portkecil10 = 'YES'
+            else: sec7portkecil10 = 'NO'
+        elif se == 8:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec8 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec8port10 = 'YES'
+            else: sec8port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec8portkecil10 = 'YES'
+            else: sec8portkecil10 = 'NO'
+        elif se == 9:
+            dasite = dsite[dsite['sek'].astype(int)==se]
+            jmlantsec9 = len(set(dasite['Ant_Type']))
+            jmlport10 = set(dasite['10/12-port'])
+            jmlportkecil10 = set(dasite['NON10/12-port'])
+            if 'YES' in jmlport10: sec9port10 = 'YES'
+            else: sec9port10 = 'NO'
+            if 'YES' in jmlportkecil10: sec9portkecil10 = 'YES'
+            else: sec9portkecil10 = 'NO'
+
+    total_ant = jmlantsec1+jmlantsec2+jmlantsec3+jmlantsec4+jmlantsec5+jmlantsec6+jmlantsec7+jmlantsec8+jmlantsec9 
+    summarysite.append([s,total_ant,jmlantsec1,jmlantsec2,jmlantsec3,jmlantsec4,jmlantsec5,jmlantsec6,jmlantsec7,jmlantsec8,jmlantsec9,sec1port10,sec2port10,sec3port10,sec4port10,sec5port10,sec6port10,sec7port10,sec8port10,sec9port10,sec1portkecil10,sec2portkecil10,sec3portkecil10])    
+summary = pd.DataFrame(summarysite,columns=hedersummary)
+summary.loc[(summary['ant_sec1']> 0 )&(summary['10/12-port-sec1']=='NO'),'Sec1 Proposal'] = 'Modernization'
+summary.loc[(summary['ant_sec1']> 1 )&(summary['10/12-port-sec1']=='YES')&(summary['NON10/12-port-sec1']=='YES'),'Sec1 Proposal'] = 'Simplifikasi'
+summary.loc[(summary['ant_sec1']< 1 )&(summary['10/12-port-sec1']=='NO'),'Sec1 Proposal'] = 'No Action'
+summary.loc[(summary['ant_sec2']> 0 )&(summary['10/12-port-sec2']=='NO'),'Sec2 Proposal'] = 'Modernization'
+summary.loc[(summary['ant_sec2']> 1 )&(summary['10/12-port-sec2']=='YES')&(summary['NON10/12-port-sec2']=='YES'),'Sec2 Proposal'] = 'Simplifikasi'
+summary.loc[(summary['ant_sec2']< 1 )&(summary['10/12-port-sec2']=='NO'),'Sec2 Proposal'] = 'No Action'
+summary.loc[(summary['ant_sec3']> 0 )&(summary['10/12-port-sec3']=='NO'),'Sec3 Proposal'] = 'Modernization'
+summary.loc[(summary['ant_sec3']> 1 )&(summary['10/12-port-sec3']=='YES')&(summary['NON10/12-port-sec3']=='YES'),'Sec3 Proposal'] = 'Simplifikasi'
+summary.loc[(summary['ant_sec3']< 1 )&(summary['10/12-port-sec3']=='NO'),'Sec3 Proposal'] = 'No Action'
+summary['final proposal'] = summary['Sec1 Proposal']+"/"+summary['Sec2 Proposal']+"/"+summary['Sec3 Proposal']
+
+writer = pd.ExcelWriter(f'{dirpath}/antennaconventer.xlsx',engine='xlsxwriter')
+summary.to_excel(writer,index=False,sheet_name='Site')
+rawsector.to_excel(writer,index=False,sheet_name='sector')
+gcell_input.to_excel(writer,index=False,sheet_name='gcell_input')
+writer.close()
+
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
