@@ -4,9 +4,9 @@ import time
 start_time = time.time()
 
 dirpath = r'D:\TSEL\RCI'  #=====tempat menyimpan file=========
-portant = r"D:\TSEL\Inventory\Type Antenna.xlsx"
-portdf = pd.read_excel(portant)
-portdf = pd.DataFrame(portdf)
+librru = r"D:\TSEL\Inventory\Jumlah RRU combine.xlsx"
+dfrru = pd.read_excel(librru)
+dfrru = pd.DataFrame(dfrru)
 ##=================Gcell Input=================
 hedjmlantsite =['Site ID','Jmlh Ant','Jmlh RRU','Ant Dual beam','Ant AIR']
 heder =['Site ID','sek','2','4','6','8','10','12']
@@ -26,7 +26,8 @@ lissite = ['BKG111','BSK722','DUM290','PAR525','PBR006','PBR146','PBR209','PBR62
 # lissite = set(gcell_input['Site ID'])
 for site in lissite:
     mode = gcell_input[gcell_input['Site ID']== site]
-    jmlrru = len(mode['Type RRU'].to_list())
+    rru = dfrru[dfrru['Site ID']==site] ##ambil data rru
+    jmlrru = len(rru['Type RRU'].to_list()) ##hitung rru
     lisbeam = mode[mode['beam']=='Dual Beam']
     b1 = set(lisbeam['sek'])
     rm = [4,5,6,7,8,9]
@@ -34,8 +35,8 @@ for site in lissite:
         while irm in b1:
             b1.remove(irm)
     jmlbeam = len(b1)
-    mode['antair'] = mode['Ant_Type'].str[0:3]
-    lisantair = mode[mode['antair'] == 'AIR']
+    # mode['antair'] = mode['Ant_Type'].str[0:3]
+    lisantair = mode[mode['beam'] == 'AIR']
     lisair = len(set(lisantair['sek']))
     lissec = set(mode['sek'])
     jmlant = 0
@@ -80,5 +81,8 @@ rawdat['Port 10 & 12'] = rawdat['10']+rawdat['12']
 rawdat['Port 2 - 8'] = rawdat['2']+rawdat['4']+rawdat['6']+rawdat['8']
 rawdata = pd.merge(rawdat,datanten,on='Site ID',how='left')
 rawdata['TotalAset']=rawdata['Jmlh Ant']+rawdata['Jmlh RRU']
-rawdata['jml ant - Dual and AIR'] = rawdata['Ant Dual beam']+rawdata['Ant AIR']
+rawdata['Dual + AIR'] = rawdata['Ant Dual beam'] + rawdata['Ant AIR']
+rawdata['Jml Ant - (Dual + AIR)'] = rawdata['Jmlh Ant'] - rawdata['Dual + AIR']
+rawdata.loc[(rawdata['TotalAset'] > 17) & (rawdata['Port 10 & 12'] == 0), 'Proposal'] = 'Modernization'
+rawdata.loc[(rawdata['TotalAset'] > 17) & (rawdata['Port 10 & 12'] > 0), 'Proposal'] = 'Simplifikasion'
 print(rawdata)
