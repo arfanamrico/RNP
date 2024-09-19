@@ -1,0 +1,111 @@
+import pandas as pd
+import os
+from collections import Counter
+import time
+start_time = time.time()
+global datar,datat
+simpan = r'D:\TSEL\RCI'
+dirpath = r'D:\TSEL\RCI\Sector'
+namafile = 'Low to high acceptor raw W36.xlsx'
+
+def satu ():
+    global datar,n
+    df = pd.read_csv(path)
+    datar = pd.DataFrame(df)
+    datar.fillna('-', inplace=True)
+    datar = datar[['week','region','site_id','type','sector_id_new','remark_redsector','prb_util_sector','unbalanced_prb','sector_capability']]
+    datar = datar[datar['region']== 'SUMBAGTENG']
+    print (f'file ke {nam} telah di append')
+    n += 1
+
+def gabung ():
+    global datar,n
+    try:
+        df = pd.read_csv(path)
+        df = pd.DataFrame(df)
+        df.fillna('-', inplace=True)
+        df = df[['week','region','site_id','type','sector_id_new','remark_redsector','prb_util_sector','unbalanced_prb','sector_capability']]
+        df = df[df['region']== 'SUMBAGTENG']
+        datar = pd.merge(datar,df, how='outer')
+        print (f'file ke {nam} telah di append')
+        n += 1
+    except:pass
+n = 1
+for name in os.listdir(dirpath):
+    path = os.path.join(dirpath, name)    
+    if path.endswith('.csv') and os.path.isfile(path):
+        nam = name[17:20]
+        if n == 1:
+            satu ()
+        else:
+            gabung ()
+# data.to_excel(f'{dirpath}/{filename}',index=False)
+rcisec4week = datar
+# print(rcisec4week)
+###================================existing band persite===================
+mcom = r"D:\TSEL\MCOM_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024.xlsx"
+heder = ['Site ID','ExistingBand']
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+# dmcom = dmcom[dmcom['VENDOR']=='Huawei'].reset_index()
+dante = dmcom[['VENDOR','Site ID','Legend']]
+# lisantperband = ['ASK008','ASK009','ASK010','ASK011','ASK012','ASK013','ASK014']
+lisantperband = set(dante['Site ID']) #mengambil semua sitelist dalam MCOM
+data = []
+for site in lisantperband:
+  dant = dante[dante['Site ID']== site]#.reset_index()
+  existband = set(dant['Legend'])
+  eb = ''
+  for b in existband:
+    eb = f'{eb}/{b}'
+  eb = eb.replace('/','',1)  
+  data.append([site,eb])
+  
+datsite = pd.DataFrame(data,columns=heder)
+# datsite.to_excel(f'{dirpath}/{namafile}',index=False)
+
+####===============CELL_to_SEC_4W==untuk mengambil data trughput===========
+dirpathcel = r'D:\TSEL\RCI\Cell'
+
+def satu ():
+    global datat,n
+    df = pd.read_csv(path)
+    datat = pd.DataFrame(df)
+    datat = datat[datat['region']== 'SUMBAGTENG']
+    # data.fillna('-', inplace=True)
+    datat = datat[['week','region','vendor','cell_name','site_id','sector_id_new','band','bdbh_weekly_throughput']]
+    print (f'file ke {nam} telah di append')
+    n += 1
+
+def gabung ():
+    global datat,n
+    try:
+        df = pd.read_csv(path)
+        df = pd.DataFrame(df)
+        # df.fillna('-', inplace=True)
+        df = df[df['region']== 'SUMBAGTENG']
+        df = df[['week','region','vendor','cell_name','site_id','sector_id_new','band','bdbh_weekly_throughput']]
+        datat = pd.merge(datat,df, how='outer')
+        print (f'file ke {nam} telah di append')
+        n += 1
+    except:pass
+n = 1
+for name in os.listdir(dirpathcel):
+    path = os.path.join(dirpathcel, name)    
+    if path.endswith('.csv') and os.path.isfile(path):
+        nam = name[20:23]
+        if n == 1:
+            satu ()
+        else:
+            gabung ()
+
+##================================================
+writer = pd.ExcelWriter(f'{simpan}/{namafile}',engine='xlsxwriter')
+datsite.to_excel(writer,index=False,sheet_name='Band-GCELL')
+rcisec4week.to_excel(writer,index=False,sheet_name='RCI-Sector-4W')
+datat.to_excel(writer,index=False,sheet_name='thrugputDL-4W')
+writer.close()
+
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
+print('='*10,'Copyright(C) Arfan Amrico','='*10)
