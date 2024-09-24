@@ -1,0 +1,135 @@
+import pandas as pd
+import os
+from collections import Counter
+import time
+start_time = time.time()
+
+dirpath = r'D:\TSEL\RCI'  #=====tempat menyimpan file=========
+librru = r"D:\TSEL\Inventory\Jumlah RRU combine.xlsx"
+dfrru = pd.read_excel(librru)
+dfrru = pd.DataFrame(dfrru)
+##=================Gcell Input=================
+hedjmlantsite =['Site ID','Jmlh Ant','Jmlh RRU','Ant Dual beam','Ant AIR']
+heder =['Site ID','sek','2','4','6','8','10','12','jmlband','exisband','jmlantsec','jmlrrusec']
+mcom = r"D:\TSEL\MCOM_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024.xlsx"
+df = pd.read_excel(mcom)
+df = pd.DataFrame(df)
+df = df[df['Ant_Type']!= 'Indoor']
+df['sek'] = df['EUtranCell'].str[-1]
+df['siteId_sec'] = df['Site ID']+"_"+df['sek']
+df['sek'] = df['sek'].astype(int)
+gcell_input = df[['Site ID','sek','siteId_sec','Legend','Tower Height','Antenna Height ','Dir','Cell_Type','Type RRU','Freq Band','Ant_Type','Antenna Port','beam']]
+jmlantsite = []
+raw = []
+lissite = ['BKG107','BKG195','BKG198','DUM634','LBB013','LBB170','LSK032','PAD503','PAR179','PAY508','PAY528','PPN524','RGT299','RGT606','SLK501','SLK517','SLK543','SLK555','SSI210','SSI928','SSI937','SWL194','TAK010','TPI169','UJT028','UJT529','UJT554','UJT609','UJT694','BKG257','PBR006','PBR043','PBR048','PBR146','PBR500','PBR503','PBR585','PBR610','PBR624','PBR707','PBR744','PBR908']
+# lissite = set(gcell_input['Site ID'])
+for site in lissite:
+    mode = gcell_input[gcell_input['Site ID']== site]
+    rru = dfrru[dfrru['Site ID']==site] ##ambil data rru
+    jmlrru = len(rru['Type RRU'].to_list()) ##hitung rru
+    lisbeam = mode[mode['beam']=='Dual Beam']
+    b1 = set(lisbeam['sek'])
+    rm = [4,5,6,7,8,9]
+    for irm in rm:
+        while irm in b1:
+            b1.remove(irm)
+    jmlbeam = len(b1)
+    lisantair = mode[mode['beam'] == 'AIR']
+    lisair = len(set(lisantair['sek']))
+    lissec = set(mode['sek'])
+    jmlant = 0
+    for s in lissec:
+        moder = mode[mode['sek']== s] 
+        moderat = mode[mode['sek']== s]  
+        moder.drop_duplicates(subset='Ant_Type', keep='first', inplace=True)     
+        if s == 1 :
+            a1 = len(set(moder['Ant_Type']))
+            jmlant += a1
+            antsec = set(moder['Ant_Type'])
+            jmlantsec = Counter(antsec)
+            jmlansec = ''
+            for k,v in jmlantsec.items():
+                jmlansec = f'{jmlansec}+{v}*{k}'
+            jmlansec = jmlansec.replace('+','',1)
+            rrusec = len(moderat['Freq Band'].tolist())
+            nban = len(set(moderat['Legend']))
+            xban = set(moderat['Legend'])
+            eb = ''
+            for b in xban:
+                eb = f'{eb}/{b}'
+            eb = eb.replace('/','',1)            
+        elif s == 2 :
+            a2 = len(set(moder['Ant_Type']))
+            jmlant += a2
+            antsec = set(moder['Ant_Type'])
+            jmlantsec = Counter(antsec)
+            jmlansec = ''
+            for k,v in jmlantsec.items():
+                jmlansec = f'{jmlansec}+{v}*{k}'
+            jmlansec = jmlansec.replace('+','',1)
+            rrusec = len(moderat['Freq Band'].tolist())
+            nban = len(set(moderat['Legend']))
+            xban = set(moderat['Legend'])
+            eb = ''
+            for b in xban:
+                eb = f'{eb}/{b}'
+            eb = eb.replace('/','',1)            
+        elif s == 3 :
+            a3 = len(set(moder['Ant_Type']))
+            jmlant += a3
+            antsec = set(moder['Ant_Type'])
+            jmlantsec = Counter(antsec)
+            jmlansec = ''
+            for k,v in jmlantsec.items():
+                jmlansec = f'{jmlansec}+{v}*{k}'
+            jmlansec = jmlansec.replace('+','',1)
+            rrusec = len(moderat['Freq Band'].tolist())
+            nban = len(set(moderat['Legend']))
+            xban = set(moderat['Legend'])
+            eb = ''
+            for b in xban:
+                eb = f'{eb}/{b}'
+            eb = eb.replace('/','',1)            
+        lisport = [2,4,6,8,10,12]
+        p2=p4=p6=p8=p10=p12=''
+        for lp in lisport:
+            if lp == 2:
+                modern = moder[moder['Antenna Port']==lp]
+                p2 = len(modern['Site ID'])
+            elif lp == 4:
+                modern = moder[moder['Antenna Port']==lp]
+                p4 = len(modern['Site ID'])
+            elif lp == 6:
+                modern = moder[moder['Antenna Port']==lp]
+                p6 = len(modern['Site ID'])
+            elif lp == 8:
+                modern = moder[moder['Antenna Port']==lp]
+                p8 = len(modern['Site ID'])
+            elif lp == 10:
+                modern = moder[moder['Antenna Port']==lp]
+                p10 = len(modern['Site ID'])
+            elif lp == 12:
+                modern = moder[moder['Antenna Port']==lp]
+                p12 = len(modern['Site ID'])
+        raw.append([site,s,p2,p4,p6,p8,p10,p12,nban,eb,jmlansec,rrusec])
+    jmlantsite.append([site,jmlant,jmlrru,jmlbeam,lisair])
+datanten = pd.DataFrame(jmlantsite,columns=hedjmlantsite)
+rawdat = pd.DataFrame(raw,columns=heder)
+rawdat['Grand Total'] = rawdat['2']+rawdat['4']+rawdat['6']+rawdat['8']+rawdat['10']+rawdat['12']
+rawdat['Port 10 & 12'] = rawdat['10']+rawdat['12']
+rawdat['Port 2 - 8'] = rawdat['2']+rawdat['4']+rawdat['6']+rawdat['8']
+rawdata = pd.merge(rawdat,datanten,on='Site ID',how='left')
+rawdata['TotalAset']=rawdata['Jmlh Ant']+rawdata['Jmlh RRU']
+rawdata['Dual + AIR'] = rawdata['Ant Dual beam'] + rawdata['Ant AIR']
+rawdata['Jml Ant - (Dual + AIR)'] = rawdata['Jmlh Ant'] - rawdata['Dual + AIR']
+rawdata.loc[(rawdata['TotalAset'] > 17) & (rawdata['Port 10 & 12'] == 0), 'Proposal'] = 'Modernization'
+rawdata.loc[(rawdata['TotalAset'] > 17) & (rawdata['Port 10 & 12'] > 0), 'Proposal'] = 'Simplifikasion'
+print(rawdata)
+# rawdata.to_excel(f'{dirpath}/modernisasi assesment_New.xlsx',index=False)
+writer = pd.ExcelWriter(f'{dirpath}/modernisasi assesment_0923_cek.xlsx',engine='xlsxwriter')
+rawdata.to_excel(writer,index=False,sheet_name='Summary')
+gcell_input.to_excel(writer,index=False,sheet_name='Gcell')
+writer.close()
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
+print('Copyright(C) Arfan Amrico')
