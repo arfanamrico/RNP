@@ -1,0 +1,66 @@
+import pandas as pd
+import os
+from collections import Counter
+import time
+start_time = time.time()
+global datar,datat
+simpan = r'D:\TSEL\RCI'
+dirpath = r'D:\TSEL\RCI\Sector'
+namafile = 'Low to high acceptor raw W37.xlsx'
+
+dfs = []
+for name in os.listdir(dirpath):
+    path = os.path.join(dirpath, name)    
+    if path.endswith('.csv') and os.path.isfile(path):
+        nam = name[17:20]
+        df = pd.read_csv(path)
+        df = df[['week','region','site_id','type','sector_id_new','remark_redsector','prb_util_sector','unbalanced_prb','sector_capability']]
+        df = df[df['region']== 'SUMBAGTENG'].reset_index()
+        dfs.append(df)
+        print (f'file ke {nam} telah di append')
+rcisec4week = pd.concat(dfs,ignore_index=True)
+###================================existing band persite===================
+mcom = r"D:\TSEL\MCOM_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024.xlsx"
+heder = ['Site ID','ExistingBand']
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+# dmcom = dmcom[dmcom['VENDOR']=='Huawei'].reset_index()
+dante = dmcom[['VENDOR','Site ID','Legend']]
+# lisantperband = ['ASK008','ASK009','ASK010','ASK011','ASK012','ASK013','ASK014']
+lisantperband = set(dante['Site ID']) #mengambil semua sitelist dalam MCOM
+data = []
+for site in lisantperband:
+  dant = dante[dante['Site ID']== site]#.reset_index()
+  existband = set(dant['Legend'])
+  eb = ''
+  for b in existband:
+    eb = f'{eb}/{b}'
+  eb = eb.replace('/','',1)  
+  data.append([site,eb])
+  
+datsite = pd.DataFrame(data,columns=heder)
+# datsite.to_excel(f'{dirpath}/{namafile}',index=False)
+
+####===============CELL_to_SEC_4W==untuk mengambil data trughput===========
+dirpathcel = r'D:\TSEL\RCI\Cell'
+
+dfcell = []
+for name in os.listdir(dirpathcel):
+    path = os.path.join(dirpathcel, name)    
+    if path.endswith('.csv') and os.path.isfile(path):
+        nam = name[20:23]
+        df = pd.read_csv(path)
+        df = df[['week','region','vendor','cell_name','site_id','sector_id_new','band','bdbh_weekly_throughput']]
+        df = df[df['region']== 'SUMBAGTENG'].reset_index()
+        dfcell.append(df)
+datat = pd.concat(dfcell, ignore_index=True)
+##================================================
+writer = pd.ExcelWriter(f'{simpan}/{namafile}',engine='xlsxwriter')
+datsite.to_excel(writer,index=False,sheet_name='Band-GCELL')
+rcisec4week.to_excel(writer,index=False,sheet_name='RCI-Sector-4W')
+datat.to_excel(writer,index=False,sheet_name='thrugputDL-4W')
+writer.close()
+
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
+print('='*10,'Copyright(C) Arfan Amrico','='*10)
