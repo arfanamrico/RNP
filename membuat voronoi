@@ -1,0 +1,22 @@
+import pandas as pd
+import geopandas as gpd
+from scipy.spatial import Voronoi
+from shapely.geometry import Point, Polygon
+import math
+
+mcom = r"D:\TSEL\MCOM_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024.xlsx"
+simpan = r"D:\TSEL\MCOM_TSEL_W36_2024\MCOM_R10_4G_TSEL_W36_2024"
+df = pd.read_excel(mcom)
+df = pd.DataFrame(df)
+##===============menambah kolom azimut sectoral==========
+df['long_AZM'] = df['Longitude'] + (pd.Series(map(math.sin, pd.Series(map(math.radians,df['Dir']))))/4500)
+df['lat_AZM'] = df['Latitude'] + (pd.Series(map(math.cos, pd.Series(map(math.radians,df['Dir']))))/4500)
+# df.to_csv(f'{simpan}/MCOM_R10_4G_TSEL_W36_2024.csv',index=False)
+##=========================================================
+geometri = gpd.points_from_xy(df['long_AZM'],df['lat_AZM'])
+gdf = gpd.GeoDataFrame(df, geometry=geometri, crs='EPSG:4326')
+points = gdf.geometry.apply(lambda geom: (geom.x, geom.y)).tolist()
+vor = Voronoi(points)
+polys = [Polygon([vor.vertices[i] for i in region]) for region in vor.regions if -1 not in region and len(region)>0]
+voronoi_gdf = gpd.GeoDataFrame(geometry=polys, crs='EPSG:4326')
+voronoi_gdf.to_file(f'{simpan}/voronoi.shp')
