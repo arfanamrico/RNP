@@ -1,0 +1,43 @@
+import openpyxl
+from openpyxl.drawing.image import Image
+from PIL import Image as PILImage
+import os
+
+# buat baru
+workbook = openpyxl.Workbook()
+# Fungsi untuk menambahkan gambar ke sheet excel
+def add_image_to_excel():
+    
+    # Buat sheet baru dengan nama sesuai dengan nama gambar
+    if img_nama in workbook.sheetnames:
+        sheet = workbook[img_nama]
+    else:
+        sheet = workbook.create_sheet(title=img_nama)
+    
+    # Buka gambar menggunakan PIL
+    img = PILImage.open(path)
+    # img.save(image_path)  # Simpan kembali agar mendukung format openpyxl
+    
+    # Tambahkan gambar ke sheet
+    img_to_add = Image(img)
+    sheet.add_image(img_to_add, 'A1')  # Menyimpan gambar pada sel A1
+    
+
+# Daftar gambar yang akan dimasukkan ke file Excel
+image_folder = r"D:\TSEL\capturan"  # Ganti dengan path folder gambar
+# image_files = [os.path.join(image_folder, f) for f in os.listdir(image_folder) if f.endswith(('png', 'jpg', 'jpeg'))]
+
+# Nama file Excel
+excel_filename = "gambar_dalam_excel.xlsx"
+
+# Proses semua gambar
+for image in os.listdir(image_folder):
+    path = os.path.join(image_folder, image)
+    if path.endswith('.jpg') and os.path.isfile(path):
+        img_nama = image.split('.')[0]
+        add_image_to_excel()
+
+
+print("Semua gambar telah berhasil dimasukkan ke file Excel.")
+# Simpan workbook
+workbook.save(f'{image_folder}/datafoto.xlsx')
