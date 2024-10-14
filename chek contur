@@ -1,0 +1,127 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import ttk, messagebox
+import os
+
+def plot_and_save(sector_id, data):
+    # Filter data based on SectorID
+    filtered_data = data[data['SectorID'] == sector_id]
+
+    if filtered_data.empty:
+        messagebox.showwarning("Warning", "No data available for the selected SectorID.")
+        return None
+
+    # Number of points to plot
+    num_points = 20
+    y_elevation = [f'Elevation{i}' for i in range(1, num_points + 1)]
+    y_signal = [str(i) for i in range(1, num_points)]
+    blocking_cols = [f'Blocking{i}' for i in range(1, num_points)]
+
+    try:
+        # Make sure to only take the first row of filtered data for plotting
+        elevation_data = filtered_data[y_elevation].iloc[0].values  # Ensure elevation_data has num_points
+        signal_data = filtered_data[y_signal].iloc[0].values  # Ensure signal_data has num_points-1
+
+        # Check if the blocking columns exist and get the correct length
+        existing_blocking_cols = [col for col in blocking_cols if col in filtered_data.columns]
+        blocking_data = filtered_data[existing_blocking_cols].iloc[0].values if existing_blocking_cols else []
+
+        # Ensure that blocking_data is of the correct length
+        if len(blocking_data) < num_points:
+            blocking_data = list(blocking_data) + [False] * (num_points - len(blocking_data))
+        
+        # Ensure that data arrays have the correct number of points
+        if len(elevation_data) != num_points or len(signal_data) != num_points - 1:
+            messagebox.showwarning("Warning", "Data for plotting has an incorrect number of points.")
+            return None
+
+        # Calculate the range for the y-axis
+        min_value = min(min(elevation_data), min(signal_data))
+        max_value = max(max(elevation_data), max(signal_data))
+
+        # Calculate x-values for plotting (distance division)
+        D_Max = filtered_data['D_Max'].iloc[0]  # Get D_Max value
+        x_values = [(i / num_points) * D_Max for i in range(1, num_points + 1)]
+
+        # Create the figure and axis
+        fig, ax1 = plt.subplots(figsize=(12, 8))
+
+        # Plot elevation data
+        ax1.fill_between(x_values, elevation_data, color='b', alpha=0.3, label='Contour (m)')
+        ax1.set_xlabel('Distance (m)')
+        ax1.set_ylabel('Contour (m)', color='b')
+        ax1.tick_params(axis='y', labelcolor='b')
+        ax1.set_ylim(min_value, max_value)
+
+        # Plot signal data
+        ax2 = ax1.twinx()
+        ax2.plot(x_values[:len(signal_data)], signal_data, marker='s', color='r', label='Signal Height (m)')
+        ax2.set_ylabel('Signal Height (m)', color='r')
+        ax2.tick_params(axis='y', labelcolor='r')
+        ax2.set_ylim(min_value, max_value)
+
+        # Plot blocking information
+        blocking_colors = ['r' if b else 'b' for b in blocking_data]
+        ax1.scatter(x_values, elevation_data, color=blocking_colors, edgecolor='k', zorder=5, label='Blocking')
+
+        # Add grid and title
+        ax1.grid(True)
+        plt.title(f'{sector_id} : Ground Contour VS Signal Height')
+
+        # Add legend for blocking
+        handles, labels = ax1.get_legend_handles_labels()
+        handles.append(plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='r', markersize=10, label='Blocking (TRUE)'))
+        handles.append(plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='b', markersize=10, label='No Blocking (FALSE)'))
+        ax1.legend(handles=handles)
+
+        # Save the plot
+        filename = f"{sector_id}.jpg"
+        plt.savefig(filename)
+        plt.close()
+
+        # Open the image
+        os.startfile(filename)
+
+        return filename
+
+    except KeyError as e:
+        messagebox.showerror("Error", f"Missing column: {e}")
+        return None
+
+
+def on_create_chart():
+    sector_id = sector_id_var.get().strip().strip("'").strip('"')  # Menghapus tanda kutip
+    if sector_id in data['SectorID'].values:
+        filename = plot_and_save(sector_id, data)
+        if filename:
+            messagebox.showinfo("Success", f"Chart saved as {filename}")
+    else:
+        messagebox.showwarning("Warning", "Selected SectorID does not exist in the data.")
+
+# Load data
+data = pd.read_csv('RC_Assessment_JPP 2025_A1_A2_A3_A4_Kontur.csv', encoding='ISO-8859-1')
+
+# Setup GUI
+root = tk.Tk()
+root.title("Site Contour Visualization")
+root.geometry("400x300")
+
+# Dropdown menu for SectorID
+sector_id_var = tk.StringVar()
+sector_ids = [sid.strip().strip("'").strip('"') for sid in data['SectorID'].unique()]
+
+# Dropdown and Text Box for SectorID selection
+ttk.Label(root, text="Select or Enter SectorID:").pack(pady=10)
+sector_id_menu = ttk.Combobox(root, textvariable=sector_id_var, values=sector_ids)
+sector_id_menu.set("Select SectorID")
+sector_id_menu.pack(pady=5)
+sector_id_entry = tk.Entry(root, textvariable=sector_id_var)
+sector_id_entry.pack(pady=5)
+
+# Create Chart button
+create_chart_button = tk.Button(root, text="Create Chart", command=on_create_chart)
+create_chart_button.pack(pady=20)
+
+# Run the GUI event loop
+root.mainloop()
