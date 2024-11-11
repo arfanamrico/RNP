@@ -1,0 +1,99 @@
+import pandas as pd
+import os
+import time
+start_time = time.time()
+
+mcom = r"D:\TSEL\MCOM_TSEL_W39_2024\MCOM_R10_4G_TSEL_W39_2024\MCOM_R10_4G_TSEL_W39_2024.xlsx"
+dirpath = r'D:\TSEL\RCI'  #=====tempat menyimpan file=========
+namafile = 'data_antennaleveling_44.xlsx' ##======output nama file=========
+
+###=====append RCI CELL 4 week untuk antenna leveling===========
+
+dfcell = []
+for name in os.listdir(f'{dirpath}/Cell'):
+    path = os.path.join(f'{dirpath}/Cell', name)    
+    if path.endswith('.csv') and os.path.isfile(path):
+        nam = name[20:23]
+        df = pd.read_csv(path)
+        df = df[['week','region','site_id','sector_id','band','prb_util_cell','edge_coverage']]
+        df = df[df['region']== 'SUMBAGTENG'].reset_index()
+        dfcell.append(df)
+data4w = pd.concat(dfcell, ignore_index=True)
+##========================================================
+datf = data4w
+datf['SiteID-Sector'] = datf['site_id'].astype(str)+"_"+datf['sector_id'].astype(str)
+pvtprb = datf.pivot_table(index='SiteID-Sector',columns=['week','band'],values='prb_util_cell',aggfunc='mean').reset_index()
+pvtprb = pvtprb.fillna(0)
+##=============================
+pvtedg = datf.pivot_table(index='SiteID-Sector',columns=['week','band'],values='edge_coverage',aggfunc='max').reset_index()
+pvtedg = pvtedg.fillna(0)
+
+pvtprb_edge = pd.merge(pvtprb,pvtedg, on='SiteID-Sector', how='left')
+##=====data dari MCOM========================
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+dmcom = dmcom[dmcom['Cell_Type']=='Macro'].reset_index()
+dmcom['SiteID-Sector'] = dmcom['Site ID'].astype(str)+"_"+dmcom['Sector'].astype(str)
+##===========pivot antenna hight====================
+danth = dmcom[['SiteID-Sector','Antenna Height ','Legend']]
+pvanth = danth.pivot_table(values='Antenna Height ', index='SiteID-Sector', columns='Legend', aggfunc='min').reset_index()
+##===========pivot tower hight==============================
+dath = dmcom[['Site ID','Tower Height']]
+pvth = dath.groupby(by=['Site ID'], as_index=False).agg({'Tower Height':'max'})  #['Tower Height'].min()
+##========================================
+hedperband = ['VENDOR','Site ID','Sector','Band','jumlah_Ant','Antenna Port','Ant_L1800','Ant_L2100','Ant_L2300','Ant_L900']
+dante = dmcom[['VENDOR','Site ID','Sector','Antenna Port','Ant_Type','Freq Band','Legend']]
+lisantperband = set(dante['Site ID']) #mengambil semua sitelist dalam MCOM
+data = []
+for site in lisantperband:
+  dant = dante[dante['Site ID']== site]
+  lissec = set(dant['Sector'])
+  for n in lissec:      
+      dan = dant[dant['Sector']== n].reset_index()
+      jmlantenna = len(set(dan['Sector']))
+      existband = set(dan['Legend'])
+      eb = '/'.join(existband)
+      lisband = ['L1800','L2100','L2300','L900']
+      l18=l21=l23=l90='-'
+      for lb in lisband:
+        if lb == 'L1800':
+          das = dan[dan['Legend']==lb].reset_index()
+          ns = len(das['Sector'])
+          if ns == 1 : l18 = f'{das.loc[0,'Ant_Type']}'
+          elif ns == 2 : l18 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+          elif ns == 3 : l18 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+        elif lb == 'L2100':
+          das = dan[dan['Legend']==lb].reset_index()
+          ns = len(das['Sector'])
+          if ns == 1 : l21 = f'{das.loc[0,'Ant_Type']}'
+          elif ns == 2 : l21 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+          elif ns == 3 : l21 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+        elif lb == 'L2300':
+          das = dan[dan['Legend']==lb].reset_index()
+          ns = len(das['Sector'])
+          if ns == 1 : l23 = f'{das.loc[0,'Ant_Type']}'
+          elif ns == 2 : l23 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+          elif ns == 3 : l23 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+        elif lb == 'L900':
+          das = dan[dan['Legend']==lb].reset_index()
+          ns = len(das['Sector'])
+          if ns == 1 : l90 = f'{das.loc[0,'Ant_Type']}'
+          elif ns == 2 : l90 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}'
+          elif ns == 3 : l90 = f'{das.loc[0,'Ant_Type']}/{das.loc[1,'Ant_Type']}/{das.loc[2,'Ant_Type']}'
+      data.append([dan.loc[0,'VENDOR'],dan.loc[0,'Site ID'],n,eb,jmlantenna,dan.loc[0,'Antenna Port'],l18,l21,l23,l90])       
+            
+antperband = pd.DataFrame(data,columns=hedperband)
+##=========================================
+writer = pd.ExcelWriter(f'{dirpath}/{namafile}',engine='xlsxwriter')
+pvtprb.to_excel(writer,sheet_name='prb_util_cell')
+pvtedg.to_excel(writer,sheet_name='edge_coverage')
+pvtprb_edge.to_excel(writer,sheet_name='pivot PRB_EDGE')
+pvanth.to_excel(writer,index=False,sheet_name='antenna_high')
+pvth.to_excel(writer,index=False,sheet_name='Tower_high')
+antperband.to_excel(writer,index=False,sheet_name='type antenna persector')
+data4w.to_excel(writer,index=False,sheet_name='RCI cell 4 Week')
+writer.close()
+
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
+print('Copyright(C) Arfan Amrico')
