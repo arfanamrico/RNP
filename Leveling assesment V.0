@@ -1,0 +1,140 @@
+import pandas as pd
+from collections import Counter
+import os
+import time
+start_time = time.time()
+
+lissite = ['SSI918','BKT095','LBB172','DUM290','SWL154','PBR219','BSK060','BTM017','PNN217','MSJ268','MSJ272','PAD135','PNN122','PNN165']
+heder = ['Site ID','Ne ID','SiteName','Long','Lat','Band','T_High','AHL9','AHL18','AHL21','AHL23','BandPlan','SecPlan','NumSec','Priority','Remark','TotAnt','TotRRU','RepAnt','RepRRU','AntL9','AntL18','AntL21','AntL23','RRU900','RRU18','RRU21','RRU23','RRU18/21']
+simpan = r'D:\TSEL\RCI'
+mcom = r"D:\TSEL\MCOM_TSEL_W39_2024\MCOM_R10_4G_TSEL_W39_2024\MCOM_R10_4G_TSEL_W39_2024.xlsx"
+dmcom = pd.read_excel(mcom)
+dmcom = pd.DataFrame(dmcom)
+dmcom = dmcom[dmcom['Cell_Type']=='Macro'].reset_index()
+dante = dmcom[['VENDOR','Site ID','NE ID','Site_Name','Longitude','Latitude','EUtranCell','Antenna Port','Ant_Type','Tower Height','Antenna Height ','Freq Band','Legend']]
+dante['Sector'] = dante['EUtranCell'].str[-1].astype(int)
+##====RRU============
+librru = r"D:\TSEL\Inventory\Jumlah RRU combine.xlsx"
+dfrru = pd.read_excel(librru)
+dfrru = pd.DataFrame(dfrru)
+##=============================
+# dant = dante[dante['Site ID'].isin(target)]
+# lissite = set(dante['Site ID']) #mengambil semua sitelist dalam MCOM
+leveling = []
+for site in lissite:
+  rru = dfrru[dfrru['Site ID']==site] ##ambil data rru
+  dant = dante[dante['Site ID']== site].reset_index()
+  dant['gap'] = dant['Tower Height'].astype(float) - dant['Antenna Height '].astype(float)
+  dant.loc[dant['gap']>= 20,'Priority'] = 'P1'
+  dant.loc[(dant['gap']>= 10)&(dant['gap']< 20),'Priority'] = 'P2'
+  dant.loc[dant['gap']< 10,'Priority'] = 'No Action'
+  towhig = int(dant.loc[0,'Tower Height'])
+  neid,sitename,long,lat = dant.loc[0,'NE ID'],dant.loc[0,'Site_Name'],dant.loc[0,'Longitude'],dant.loc[0,'Latitude']
+  existband = set(dant['Legend'])
+  ebs = '/'.join(existband)
+  lissec = [1,2,3]
+  dfse = dant[dant['Sector'].isin(lissec)]
+  dfsb = dfse[dfse['gap']>= 10]
+  csecp = sorted(set(dfsb['Sector'].astype(str))) ## cek sector plan
+  secp = '_'.join(csecp)
+  jsecp = len(csecp) ## Jumlah sector
+  cbandp = set(dfsb['Legend']) ## cek band plan
+  bandp = '/'.join(cbandp)
+  cprio = set(dfsb['Priority']) ## cek priority
+  prio = '_'.join(cprio)
+  minah = dfsb['Antenna Height '].min()
+  remark = f'Reheigh from {minah} to {towhig}'
+  hal9=hal18=hal21=hal23 = ''
+  antl9=antl18=antl21=antl23 = ''
+  ru9=ru18=ru21=ru23=rul18_L21 = ''
+  for b in existband:
+      dfb = dfse[dfse['Legend']== b]
+      if b == 'L900':
+        cantl = dfb['Ant_Type'].tolist()
+        antl9 = '/'.join(cantl)
+        ahb9 = dfb['Antenna Height '].tolist()
+        if len(ahb9) == 1 : hal9 = f'{ahb9[0]}'
+        elif len(ahb9) == 2 : hal9 = f'{ahb9[0]}/{ahb9[1]}'
+        elif len(ahb9) >= 3 : hal9 = f'{ahb9[0]}/{ahb9[1]}/{ahb9[2]}'
+        rrub = rru[rru['band']==b]
+        nrru = list(rrub['Type RRU'].to_list()) ##hitung rru
+        jmlrru = Counter(nrru)
+        ru9 = 0
+        for k,v in jmlrru.items():
+          ru9 += v
+      if b == 'L1800':
+        cantl = dfb['Ant_Type'].tolist()
+        antl18 = '/'.join(cantl)
+        ahb18 = dfb['Antenna Height '].tolist()
+        if len(ahb18) == 1 : hal18 = f'{ahb18[0]}'
+        elif len(ahb18) == 2 : hal18 = f'{ahb18[0]}/{ahb18[1]}'
+        elif len(ahb18) >= 3 : hal18 = f'{ahb18[0]}/{ahb18[1]}/{ahb18[2]}'
+        rrub = rru[rru['band']==b]
+        nrru = list(rrub['Type RRU'].to_list()) ##hitung rru
+        jmlrru = Counter(nrru)
+        ru18 = 0
+        for k,v in jmlrru.items():
+          ru18 += v
+      if b == 'L2100':
+        cantl = dfb['Ant_Type'].tolist()
+        antl21 = '/'.join(cantl)
+        ahb21 = dfb['Antenna Height '].tolist()
+        if len(ahb21) == 1 : hal21 = f'{ahb21[0]}'
+        elif len(ahb21) == 2 : hal21 = f'{ahb21[0]}/{ahb21[1]}'
+        elif len(ahb21) >= 3 : hal21 = f'{ahb21[0]}/{ahb21[1]}/{ahb21[2]}'
+        rrub = rru[rru['band']==b]
+        nrru = list(rrub['Type RRU'].to_list()) ##hitung rru
+        jmlrru = Counter(nrru)
+        ru21 = 0
+        for k,v in jmlrru.items():
+          ru21 += v
+      if b == 'L2300':
+        cantl = dfb['Ant_Type'].tolist()
+        antl23 = '/'.join(cantl)
+        ahb23 = dfb['Antenna Height '].tolist()
+        if len(ahb23) == 1 : hal23 = f'{ahb23[0]}'
+        elif len(ahb23) == 2 : hal23 = f'{ahb23[0]}/{ahb23[1]}'
+        elif len(ahb23) >= 3 : hal23 = f'{ahb23[0]}/{ahb23[1]}/{ahb23[2]}'
+        rrub = rru[rru['band']==b]
+        nrru = list(rrub['Type RRU'].to_list()) ##hitung rru
+        jmlrru = Counter(nrru)
+        ru23 = 0
+        for k,v in jmlrru.items():
+          ru23 += v
+  rrub = rru[rru['band']=='L1800/L2100']
+  nrru = list(rrub['Type RRU'].to_list()) ##hitung rru
+  jmlrru = Counter(nrru)
+  rul18_L21 = 0
+  for k,v in jmlrru.items():
+    rul18_L21 += v    
+
+  ##===========chek ALL antenna==============
+  for s in lissec:
+    dfja = dfse[dfse['Sector']== s]
+    if s == 1:
+      jase1 = len(set(dfja['Ant_Type']))
+      jrru1 = len(dfja['Ant_Type'])
+    elif s == 2:
+      jase2 = len(set(dfja['Ant_Type']))
+      jrru2 = len(dfja['Ant_Type'])
+    elif s == 3:
+      jase3 = len(set(dfja['Ant_Type']))
+      jrru3 = len(dfja['Ant_Type'])
+  tot_ant = jase1+jase2+jase3
+  tot_rru = jrru1+jrru2+jrru3
+  ##============chek SOW antenna=========
+  jss=jrr = 0
+  for ss in csecp:
+    dfas = dfsb[dfsb['Sector'].astype(str)== ss]
+    jss += len(set(dfas['Ant_Type']))
+    jrr += len(dfas['Ant_Type'])
+    
+
+  leveling.append([site,neid,sitename,long,lat,ebs,towhig,hal9,hal18,hal21,hal23,bandp,secp,jsecp,prio,remark,tot_ant,tot_rru,jss,jrr,antl9,antl18,antl21,antl23,ru9,ru18,ru21,ru23,rul18_L21])
+
+dat_leveling = pd.DataFrame(leveling,columns=heder)
+dat_leveling = dat_leveling[['Site ID','Ne ID','SiteName','Long','Lat','Band','SecPlan','NumSec','TotAnt','TotRRU','RepAnt','RepRRU','Remark','BandPlan','T_High','AHL9','AHL18','AHL21','AHL23','AntL9','AntL18','AntL21','AntL23','RRU900','RRU18','RRU21','RRU23','RRU18/21','Priority']]
+dat_leveling.to_excel(f'{simpan}/leveling_BOQ_test.xlsx', index=False)
+# print(dat_leveling)
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
