@@ -1,0 +1,207 @@
+import pandas as pd
+import time
+start_time = time.time()
+
+pathc = r"D:\TSEL\MCOM_TSEL_W46_2024\MCOM_R10_4G_TSEL_W46_2024\MCOM_R10_4G_TSEL_W46_2024.xlsx"
+dfc = pd.read_excel(pathc)
+dfc = pd.DataFrame(dfc)
+dfc['siteid_sec'] = dfc['Site ID']+"_"+dfc['Cell_Type']+"_"+dfc['Sector'].astype(str)
+# df = df[df['type']=='MAC']
+listsitec = set(dfc['Site ID'])
+dfb = []
+for s in listsitec:
+    dfs = dfc[dfc['Site ID']== s].reset_index()
+    band = sorted(set(dfs['Legend']))
+    if 'L900' in band:
+        band.remove('L900')
+        band.insert(0,'L900')
+    eb = '/'.join(band)
+    cekband = ['L900','L1800','L2100','L2300'] 
+    nyband = [el for el in cekband if el not in band]
+    nyb = '/'.join(nyband)
+    dfb.append([dfs.loc[0,'VENDOR'],s,eb,nyb])
+siteband = pd.DataFrame(dfb,columns=['VENDOR','Site ID','Band','Band_N/Y'])
+##================================
+path = r"D:\Parsing\rci.csv"
+simpan = r'D:\xx'
+df = pd.read_csv(path)
+df = pd.DataFrame(df)
+df['siteid_sec'] = df['site_id']+"_"+df['type']+"_"+df['sector_id_new'].astype(str)
+df = df[df['type']=='MAC']
+#############==========Remark RedSector==============
+n = 0
+for week in df['week'].unique():
+    if n == 0:
+        dfrs = df[df['week']==week]
+        dfrs.rename(columns={'remark_redsector':week}, inplace=True) 
+        dfrs = dfrs[['siteid_sec',week]]   
+        n += 1
+    else:
+        dfrsn = df[df['week']==week]
+        dfrsn.rename(columns={'remark_redsector':week}, inplace=True)
+        dfrsn = dfrsn[['siteid_sec',week]]
+        dfrs = pd.merge(dfrs,dfrsn, on='siteid_sec',how='left')
+        n += 1
+
+# Fungsi untuk menghitung jumlah '1. Direct Investment Intervention Sites' dalam satu baris
+def hitung_RS(row):
+    return (row == '1. Direct Investment Intervention Sites').sum()
+# Terapkan fungsi ke setiap baris DataFrame
+dfrs['jmlRS'] = dfrs[dfrs.columns[[1,2,3,4]]].apply(hitung_RS, axis=1)
+dfrs['RemarkSector'] = dfrs['jmlRS'].apply(lambda x: '1. Direct Investment Intervention Sites' if x == 4 else 'Other Criteria')
+datars = dfrs[['siteid_sec','RemarkSector']]
+# dfrs.to_excel(f'{simpan}/testtest.xlsx', index=False)
+###=============memfilter direc investment intervention sites=========
+# dis = '1. Direct Investment Intervention Sites'
+# dfdis = df1[(df1[df1.columns[1]]==dis)&(df1[df1.columns[2]]==dis)&(df1[df1.columns[3]]==dis)&(df1[df1.columns[4]]==dis)]
+# print(dfdis)
+####=========PRB UTIL=================================
+n = 0
+for week in df['week'].unique():
+    if n == 0:
+        dfprb = df[df['week']==week]
+        dfprb.rename(columns={'prb_util_sector':f'prb_{week}'}, inplace=True) 
+        dfprb = dfprb[['siteid_sec',f'prb_{week}']]   
+        n += 1
+    else:
+        dfprbn = df[df['week']==week]
+        dfprbn.rename(columns={'prb_util_sector':f'prb_{week}'}, inplace=True)
+        dfprbn = dfprbn[['siteid_sec',f'prb_{week}']]
+        dfprb = pd.merge(dfprb,dfprbn, on='siteid_sec',how='left')
+        n += 1
+# Fungsi untuk menentukan hasil berdasarkan kriteria
+def determine_result(row):
+    # Ambil nilai dari kolom A, B, C, dan D
+    values = row[[dfprb.columns[1], dfprb.columns[2], dfprb.columns[3], dfprb.columns[4]]]    
+    # Hitung jumlah nilai yang memenuhi kriteria
+    above_90 = (values >= 90).sum()
+    between_80_and_90 = ((values >= 80) & (values < 90)).sum()
+    below_80 = (values < 80).sum()    
+    # Tentukan hasil berdasarkan kriteria
+    if above_90 == len(values):  # Semua nilai >= 90
+        return "above 90"
+    elif between_80_and_90 >= 3:  # >= 3 nilai berada di range 80-90
+        return "above 80"
+    elif below_80 >= 3:  # >= 3 nilai berada di bawah 80
+        return "below 80"
+    else:
+        return "above 80"
+# Tambahkan kolom "hasil" ke DataFrame
+dfprb['PRBUtil'] = dfprb.apply(determine_result, axis=1)
+dataprb = dfprb[['siteid_sec','PRBUtil']]
+####=========UNBALANCE=================================
+n = 0
+for week in df['week'].unique():
+    if n == 0:
+        dfup = df[df['week']==week]
+        dfup.rename(columns={'unbalanced_prb':f'up_{week}'}, inplace=True) 
+        dfup = dfup[['siteid_sec',f'up_{week}']]   
+        n += 1
+    else:
+        dfupn = df[df['week']==week]
+        dfupn.rename(columns={'unbalanced_prb':f'up_{week}'}, inplace=True)
+        dfupn = dfupn[['siteid_sec',f'up_{week}']]
+        dfup = pd.merge(dfup,dfupn, on='siteid_sec',how='left')
+        n += 1
+# Fungsi untuk menentukan hasil berdasarkan kriteria
+def sector_balan(row):
+    # Ambil nilai dari kolom A, B, C, dan D
+    values = row[[dfup.columns[1], dfup.columns[2], dfup.columns[3], dfup.columns[4]]]    
+    # Hitung jumlah nilai yang memenuhi kriteria
+    balance = (values == 'Balanced').sum()
+    unbalance = (values == 'Unbalanced').sum()    
+    # Tentukan hasil berdasarkan kriteria
+    if balance == len(values):  # Semua nilai >= 70
+        return "Sector Balanced"
+    elif unbalance >= 3:  # >= 3 nilai berada di bawah 80
+        return "Sector Unbalanced"
+    else:
+        return "Sector Unbalanced"
+# Tambahkan kolom "hasil" ke DataFrame
+dfup['Sec_Balance'] = dfup.apply(sector_balan, axis=1)
+dataup = dfup[['siteid_sec','Sec_Balance']]
+####=========Sector Capability=================================
+n = 0
+for week in df['week'].unique():
+    if n == 0:
+        dfsc = df[df['week']==week]
+        dfsc.rename(columns={'sector_capability':f'sc_{week}'}, inplace=True) 
+        dfsc = dfsc[['siteid_sec',f'sc_{week}']]   
+        n += 1
+    else:
+        dfscn = df[df['week']==week]
+        dfscn.rename(columns={'sector_capability':f'sc_{week}'}, inplace=True)
+        dfscn = dfscn[['siteid_sec',f'sc_{week}']]
+        dfsc = pd.merge(dfsc,dfscn, on='siteid_sec',how='left')
+        n += 1
+# Fungsi untuk menentukan hasil berdasarkan kriteria
+def sector_capabi(row):
+    # Ambil nilai dari kolom A, B, C, dan D
+    values = row[[dfsc.columns[1], dfsc.columns[2], dfsc.columns[3], dfsc.columns[4]]]    
+    # Hitung jumlah nilai yang memenuhi kriteria
+    above_70 = (values >= 70).sum()
+    below_70 = (values < 70).sum()    
+    # Tentukan hasil berdasarkan kriteria
+    if above_70 == len(values):  # Semua nilai >= 70
+        return "above 70"
+    elif below_70 >= 3:  # >= 3 nilai berada di bawah 80
+        return "below 70"
+    else:
+        return "below 70"
+# Tambahkan kolom "hasil" ke DataFrame
+dfsc['Sec_Cap'] = dfsc.apply(sector_capabi, axis=1)
+datasc = dfsc[['siteid_sec','Sec_Cap']]
+####=========BDBH Throughput=================================
+n = 0
+for week in df['week'].unique():
+    if n == 0:
+        dfth = df[df['week']==week]
+        dfth.rename(columns={'bdbh_weekly_throughput':f'th_{week}'}, inplace=True) 
+        dfth = dfth[['siteid_sec',f'th_{week}']]   
+        n += 1
+    else:
+        dfthn = df[df['week']==week]
+        dfthn.rename(columns={'bdbh_weekly_throughput':f'th_{week}'}, inplace=True)
+        dfthn = dfthn[['siteid_sec',f'th_{week}']]
+        dfth = pd.merge(dfth,dfthn, on='siteid_sec',how='left')
+        n += 1
+# Fungsi untuk menentukan hasil berdasarkan kriteria
+def bdbh_thput(row):
+    # Ambil nilai dari kolom A, B, C, dan D
+    values = row[[dfth.columns[1], dfth.columns[2], dfth.columns[3], dfth.columns[4]]]    
+    # Hitung jumlah nilai yang memenuhi kriteria
+    above_15 = (values >= 1500).sum()
+    below_15 = (values < 1500).sum()    
+    # Tentukan hasil berdasarkan kriteria
+    if below_15 == len(values):  # Semua nilai >= 70
+        return "below 1.5"
+    elif above_15 >= 3:  # >= 3 nilai berada di bawah 80
+        return "above 1.5"
+    else:
+        return "above 1.5"
+# Tambahkan kolom "hasil" ke DataFrame
+dfth['bdbh_thp'] = dfth.apply(bdbh_thput, axis=1)
+datath = dfth[['siteid_sec','bdbh_thp']]
+
+l2hass = pd.merge(dfrs,dfprb, on='siteid_sec', how='left')
+l2hass = pd.merge(l2hass,dfup, on='siteid_sec', how='left')
+l2hass = pd.merge(l2hass,dfsc, on='siteid_sec', how='left')
+l2hass = pd.merge(l2hass,dfth, on='siteid_sec', how='left')
+# l2hass['Site ID'] = l2hass['siteid_sec'].str.split('_').str[0]
+l2hass.insert(0,'Site ID',l2hass['siteid_sec'].str.split('_').str[0])
+
+l2hass = pd.merge(l2hass,siteband, on='Site ID', how='left')
+writer = pd.ExcelWriter(f'{simpan}/test_test.xlsx',engine='xlsxwriter')
+l2hass.to_excel(writer,index=False,sheet_name='summary')
+dfrs.to_excel(writer,index=False,sheet_name='Remark_sector')
+dfprb.to_excel(writer,index=False,sheet_name='PRBUtil')
+dfup.to_excel(writer,index=False,sheet_name='Unbalanced')
+dfsc.to_excel(writer,index=False,sheet_name='Sec_Capability')
+dfth.to_excel(writer,index=False,sheet_name='BDBH_Thp')
+siteband.to_excel(writer,index=False,sheet_name='band')
+writer.close()
+
+l2hass = l2hass[(l2hass['RemarkSector']== '1. Direct Investment Intervention Sites')&(l2hass['PRBUtil']== 'above 90')&(l2hass['Sec_Cap']== 'above 70')]
+print(l2hass[['VENDOR','siteid_sec','Band','Band_N/Y','RemarkSector','PRBUtil','Sec_Balance','Sec_Cap','bdbh_thp']])
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
