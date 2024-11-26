@@ -1,0 +1,97 @@
+import pandas as pd
+from collections import Counter
+import time
+start_time = time.time()
+
+listsitec = ['PBR037','PBR039','BKG013','BKG017','BKG018','BKG020','BKG021','BKG033','BKG038','BKG039','BKG051','BKG078','BKG084','BKG112','BKG114','BKG130','BKG160','BKG203','BKG204','BKG233','BKG234','BKG257','BKG299','BKG342','BKG510','BKG577','BKG677','BKG682','BKG686','BKG703','BKG705','BKG746','COJ041','PBR002','PBR003','PBR004','PBR005','PBR006','PBR006','PBR010','PBR011','PBR012','PBR013','PBR014','PBR015','PBR016','PBR017','PBR018','PBR019','PBR020','PBR021','PBR022','PBR023','PBR024','PBR025','PBR026','PBR027','PBR028','PBR030','PBR031','PBR032','PBR033','PBR034','PBR035','PBR036','PBR038','PBR040','PBR041','PBR043','PBR045','PBR046','PBR049','PBR050','PBR051','PBR052','PBR053','PBR054','PBR057','PBR058','PBR059','PBR060','PBR062','PBR063','PBR064','PBR065','PBR066','PBR067','PBR068','PBR069','PBR071','PBR072','PBR073','PBR074','PBR075','PBR078','PBR079','PBR080','PBR082','PBR084','PBR085','PBR086','PBR087','PBR089','PBR091','PBR092','PBR093','PBR094','PBR096','PBR097','PBR099','PBR100','PBR101','PBR102','PBR103','PBR105','PBR106','PBR107','PBR109','PBR110','PBR111','PBR113','PBR114','PBR115','PBR118','PBR119','PBR122','PBR123','PBR124','PBR125','PBR126','PBR127','PBR129','PBR131','PBR133','PBR134','PBR135','PBR136','PBR137','PBR138','PBR141','PBR142','PBR143','PBR144','PBR146','PBR148','PBR149','PBR150','PBR151','PBR154','PBR155','PBR156','PBR157','PBR159','PBR161','PBR162','PBR163','PBR164','PBR165','PBR166','PBR168','PBR169','PBR174','PBR178','PBR179','PBR180','PBR181','PBR182','PBR183','PBR184','PBR185','PBR186','PBR188','PBR189','PBR191','PBR192','PBR193','PBR194','PBR195','PBR196','PBR197','PBR198','PBR199','PBR200','PBR201','PBR202','PBR203','PBR204','PBR205','PBR206','PBR207','PBR209','PBR210','PBR212','PBR213','PBR214','PBR215','PBR216','PBR219','PBR221','PBR222','PBR224','PBR229','PBR237','PBR239','PBR245','PBR254','PBR255','PBR265','PBR280','PBR283','PBR292','PBR297','PBR298','PBR301','PBR305','PBR307','PBR310','PBR314','PBR319','PBR321','PBR327','PBR330','PBR334','PBR336','PBR337','PBR338','PBR339','PBR340','PBR340','PBR378','PBR379','PBR380','PBR381','PBR382','PBR383','PBR384','PBR385','PBR386','PBR387','PBR388','PBR389','PBR390','PBR391','PBR392','PBR393','PBR394','PBR395','PBR396','PBR397','PBR398','PBR405','PBR405','PBR408','PBR414','PBR417','PBR417','PBR418','PBR420','PBR425','PBR426','PBR427','PBR429','PBR430','PBR432','PBR432','PBR433','PBR438','PBR440','PBR441','PBR445','PBR447','PBR448','PBR449','PBR450','PBR452','PBR452','PBR457','PBR468','PBR475','PBR489','PBR490','PBR491','PBR495','PBR500','PBR503','PBR506','PBR507','PBR509','PBR510','PBR511','PBR513','PBR514','PBR515','PBR516','PBR517','PBR519','PBR520','PBR521','PBR521','PBR523','PBR524','PBR525','PBR526','PBR528','PBR530','PBR531','PBR534','PBR536','PBR537','PBR538','PBR540','PBR542','PBR543','PBR545','PBR546','PBR551','PBR552','PBR553','PBR554','PBR556','PBR557','PBR558','PBR560','PBR561','PBR562','PBR563','PBR567','PBR568','PBR569','PBR570','PBR571','PBR572','PBR572','PBR574','PBR575','PBR576','PBR578','PBR584','PBR585','PBR587','PBR593','PBR593','PBR594','PBR594','PBR594','PBR595','PBR600','PBR607','PBR701','PBR702','PBR703','PBR704','PBR707','PBR707','PBR708','PBR709','PBR710','PBR711','PBR712','PBR713','PBR714','PBR715','PBR718','PBR723','PBR724','PBR725','PBR726','PBR727','PBR730','PBR732','PBR733','PBR734','PBR735','PBR736','PBR737','PBR738','PBR740','PBR743','PBR744','PBR744','PBR745','PBR747','PBR747','PBR748','PBR749','PBR749','PBR752','PBR752','PBR753','PBR754','PBR759','PBR761','PBR762','PBR766','PBR767','PBR768','PBR769','PBR770','PBR771','PBR772','PBR774','PBR775','PBR776','PBR777','PBR778','PBR780','PBR782','PBR783','PBR784','PBR785','PBR788','PBR792','PBR795','PBR796','PBR798','PBR799','PBR800','PBR801','PBR802','PBR806','PBR807','PBR809','PBR813','PBR814','PBR816','PBR817','PBR819','PBR822','PBR824','PBR825','PBR826','PBR827','PBR828','PBR830','PBR831','PBR834','PBR835','PBR836','PBR837','PBR838','PBR838','PBR840','PBR842','PBR853','PBR854','PBR856','PBR857','PBR858','PBR859','PBR860','PBR861','PBR862','PBR863','PBR864','PBR865','PBR866','PBR867','PBR869','PBR870','PBR871','PBR872','PBR873','PBR874','PBR878','PBR879','PBR880','PBR881','PBR882','PBR885','PBR887','PBR889','PBR890','PBR891','PBR893','PBR895','PBR904','PBR905','PBR908','PBR908','PBR912','PBR916','PBR929','PBR930','PBR931','PBR932','PBR934','PBR937','PBR944','PBR958','PBR965','PBR965','PBR965','PBR966','PBR967','PBR968','PBR970','PBR971','PBR972','PBR973','PBR974','PBR975','PBR976','PBR977','PBR978','PBR979','PBR981','PBR982','PBR983','PBR984','PBR985','PBR986','PBR987','PBR988','PBR989','PBR990','PBR991','PBR992','PBR993','PBR994','PBR995','PBR996','PBR997','PBR999','PRX002','PRX003','PRX004','PRX006','PRX007','PRX008','PRX009','PRX010','PRX013','PRX014','PRX015','PRX016','PRX017','PRX018','PRX019','PRX020','PRX021','PRX022','PRX023','PRX031','PRX032','PRX034','PRX035','PRX036','PRX037','PRX038','PBR009']
+pathc = r"D:\TSEL\MCOM_TSEL_W46_2024\MCOM_R10_4G_TSEL_W46_2024\MCOM_R10_4G_TSEL_W46_2024.xlsx"
+simpan = r'D:\xx'
+dfc = pd.read_excel(pathc)
+dfc = pd.DataFrame(dfc)
+dfc['siteid_sec'] = dfc['Site ID']+"_"+dfc['Cell_Type']+"_"+dfc['Sector'].astype(str)
+# dfc = dfc[dfc['Cell_Type'].isin(['Macro','Massive MiMo','Add Sector','BTS Hotel','Eazy Macro','Outdoor','COMBAT','Micro Indoor','Lampsite','B2S','Indoor&Macro'])]
+# listsitec = set(dfc['Site ID'])
+dfb = []
+for s in listsitec:
+    dfs = dfc[dfc['Site ID']== s]
+    eband = sorted(set(dfs['Legend']))
+    eb = '/'.join(eband)
+    band = ['L900','L1800','L2100','L2300','L18/L21'] 
+    antl9=antl18=antl21=antl23 = ''
+    for b in band:
+        if b == 'L900':
+            dfsb = dfs[dfs['Legend']== b].reset_index()
+            dfsb91 = dfsb[dfsb['Sector'].isin([1,4])]
+            ant91 = set(dfsb91['Ant_Type']) ## hapus duplikat antenna sec1 dan 4
+            dfsb92 = dfsb[dfsb['Sector'].isin([2,5])]
+            ant92 = set(dfsb92['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            dfsb93 = dfsb[dfsb['Sector'].isin([3,6])]
+            ant93 = set(dfsb93['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            ant = list(ant91)+list(ant92)+list(ant93)
+            # if len(dfsb['Site ID'])==1:
+            # ant = dfsb['Ant_Type'].tolist()
+            cant = Counter(ant)
+            ant9 = ''
+            for k,v in cant.items():
+                ant9 =f'{ant9}/{v}*{k}'
+            ant9 = ant9.replace('/','',1)
+        elif b == 'L1800':
+            dfsb = dfs[dfs['Legend']== b].reset_index()
+            dfsb181 = dfsb[dfsb['Sector'].isin([1,4])]
+            ant181 = set(dfsb181['Ant_Type']) ## hapus duplikat antenna sec1 dan 4
+            dfsb182 = dfsb[dfsb['Sector'].isin([2,5])]
+            ant182 = set(dfsb182['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            dfsb183 = dfsb[dfsb['Sector'].isin([3,6])]
+            ant183 = set(dfsb183['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            ant = list(ant181)+list(ant182)+list(ant183)
+            # ant = dfsb['Ant_Type'].tolist()
+            cant = Counter(ant)
+            ant18 = ''
+            for k,v in cant.items():
+                ant18 =f'{ant18}/{v}*{k}'
+            ant18 = ant18.replace('/','',1)
+        elif b == 'L2100':
+            dfsb = dfs[dfs['Legend']== b].reset_index()
+            dfsb211 = dfsb[dfsb['Sector'].isin([1,4])]
+            ant211 = set(dfsb211['Ant_Type']) ## hapus duplikat antenna sec1 dan 4
+            dfsb212 = dfsb[dfsb['Sector'].isin([2,5])]
+            ant212 = set(dfsb212['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            dfsb213 = dfsb[dfsb['Sector'].isin([3,6])]
+            ant213 = set(dfsb213['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            ant = list(ant211)+list(ant212)+list(ant213)
+            # ant = dfsb['Ant_Type'].tolist()
+            cant = Counter(ant)
+            ant21 = ''
+            for k,v in cant.items():
+                ant21 =f'{ant21}/{v}*{k}'
+            ant21 = ant21.replace('/','',1)
+        elif b == 'L2300':
+            dfsb = dfs[dfs['Legend']== b].reset_index()
+            ddfsb = dfsb[~((dfsb['Legend'] == 'L2300') & (dfsb.duplicated(subset=['Sector', 'Legend'], keep='first')))] ## menghapus F2,F3 L2300
+            ant = ddfsb['Ant_Type'].tolist()
+            cant = Counter(ant)
+            ant23 = ''
+            for k,v in cant.items():
+                ant23 =f'{ant23}/{v}*{k}'
+            ant23 = ant23.replace('/','',1)
+        elif b == 'L18/L21':
+            dfsb = dfs[dfs['Legend'].isin(['L1800','L2100'])].reset_index()
+            dfsb1 = dfsb[dfsb['Sector'].isin([1,4])]
+            ant1 = set(dfsb1['Ant_Type']) ## hapus duplikat antenna sec1 dan 4
+            dfsb2 = dfsb[dfsb['Sector'].isin([2,5])]
+            ant2 = set(dfsb2['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            dfsb3 = dfsb[dfsb['Sector'].isin([3,6])]
+            ant3 = set(dfsb3['Ant_Type']) ## hapus duplikat antenna sec2 dan 5
+            ant = list(ant1)+list(ant2)+list(ant3)
+            cant = Counter(ant)
+            ant18_21 = ''
+            for k,v in cant.items():
+                ant18_21 =f'{ant18_21}/{v}*{k}'
+            ant18_21 = ant18_21.replace('/','',1)
+    # print(s,antl18,antl21,antl23,antl9)
+    dfb.append([s,eb,ant18,ant18_21,ant21,ant23,ant9])
+siteband = pd.DataFrame(dfb,columns=['Site ID','Band','antL1800','antL18_L21','antL2100','antL2300','antL900'])
+siteband.to_excel(f'{simpan}/cekantenna5G_rev1.xlsx',index=False)
+print(siteband)
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
