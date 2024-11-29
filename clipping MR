@@ -1,0 +1,29 @@
+### penting, file point dan polygon harus berada disatu folder <<==========
+
+import time
+start_time = time.time()
+import geopandas 
+import logging
+
+# Load Mapinfo TAB files
+points = geopandas.read_file(r"D:\TSEL\Covmo\RSRP -105_Rev\RSRP -105_Rev.tab")
+polygons = geopandas.read_file(r"D:\TSEL\Covmo\RSRP -105_Rev\Buffer Sumbagteng.tab")
+
+# Ensure both files use the same CRS
+if points.crs != polygons.crs:
+    points = points.to_crs(polygons.crs)
+
+logging.basicConfig(level=logging.INFO)
+print("Memulai clipping...")
+# Clip points using the polygon
+clipped_points = geopandas.sjoin(points, polygons, predicate="within") 
+print(f"Selesai clipping: {len(clipped_points)} titik")
+
+# Save the result to a new file
+clipped_points.to_file(r"D:\TSEL\Covmo\RSRP -105_Rev\Clipped_points.tab", driver="MapInfo File")
+
+print("Clipping completed. Saved to 'clipped_points.tab'.")
+
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
+print('Copyright(C) Arfan Amrico')
