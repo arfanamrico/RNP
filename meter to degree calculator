@@ -1,0 +1,30 @@
+import math
+
+def meter_to_degree_lat(meter):
+    """
+    Konversi meter ke derajat lintang.
+    1 derajat lintang setara dengan 111.32 km.
+    """
+    return meter / 111320
+
+def meter_to_degree_lon(meter, latitude):
+    """
+    Konversi meter ke derajat bujur.
+    Panjang 1 derajat bujur bergantung pada lintang.
+    """
+    return meter / (111320 * math.cos(math.radians(latitude)))
+
+# Input
+meter = float(input("Masukkan jarak dalam meter: "))
+latitude = float(input("Masukkan lintang lokasi (dalam derajat, suggest 0 - 3): "))
+
+# Konversi
+degree_lat = meter_to_degree_lat(meter)
+degree_lon = meter_to_degree_lon(meter, latitude)
+
+# Output
+print(f"\n{meter} meter setara dengan:")
+print(f"- {degree_lat:.6f} derajat lintang")
+print(f"- {degree_lon:.6f} derajat bujur (di lintang {latitude}°)")
+
+print('Copyright(C) Arfan Amrico')
