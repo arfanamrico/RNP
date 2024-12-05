@@ -1,0 +1,91 @@
+import pandas as pd
+from collections import Counter
+import time
+start_time = time.time()
+
+lissite = ['PPN228','NTJ004','NTJ007'] ## ===> site yg dibuat IRR nya
+
+
+dirpath = r"D:\TSEL\MCOM_TSEL_W47_2024\MCOM_R10_4G_TSEL_W47_2024\MCOM_R10_4G_TSEL_W47_2024.xlsx" ###==== file MCOM========
+mcom = pd.read_excel(dirpath)
+mcom = pd.DataFrame(mcom)
+heder = ['VENDOR','SITE_ID','NE_ID','SITE_NAME','LONG','LAT','BAND','BTS_TYPE','SECTOR','ANTENA_HEIGHT']
+simpan = r'D:\TSEL\RCI'
+#=================
+head_IRR = ['AREA','REGION','VENDOR','SITE_ID','NE_ID','SITE_NAME','LONG','LAT','SYSTEM','BAND','BTS_TYPE','SECTOR','PLAN_TOWER_PROVIDER','ANTENA_HEIGHT']
+data = []
+filename = 'IRR.xlsx'
+area,region,vendor,system = 'Area 1','R10 Sumbagteng','Telkom Infra','4G'
+
+#====================
+df = mcom[['Site ID','NE ID','Site_Name','Longitude','Latitude','Legend','Cell_Type','Sector','Antenna Height ','Ant_Type','toco']]
+# lissite = set(df['Site ID'])
+# lissite = ['BKG111','PKR539','PBR908'] ## ===> site yg dibuat IRR nya
+# df['Site ID'] =  df['eNodeB Name'].str.split('_').str[0]
+
+def satu ():
+        SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,toco,ANTENA_HEIGHT = dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}',dq.loc[0,'toco'],dq.loc[0,'Antenna Height ']
+        data.append([area,region,vendor,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,system,BAND,BTS_TYPE,SECTOR,toco,int(ANTENA_HEIGHT)])
+def dua ():
+    try:
+        SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,toco,ANTENA_HEIGHT = dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}_{dq.loc[1,'Sector']}',dq.loc[0,'toco'],dq.loc[0,'Antenna Height ']
+        data.append([area,region,vendor,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,system,BAND,BTS_TYPE,SECTOR,toco,int(ANTENA_HEIGHT)])
+    except:pass
+def tiga ():
+    try:
+        SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,toco,ANTENA_HEIGHT = dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}_{dq.loc[1,'Sector']}_{dq.loc[2,'Sector']}',dq.loc[0,'toco'],dq.loc[0,'Antenna Height ']
+        data.append([area,region,vendor,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,system,BAND,BTS_TYPE,SECTOR,toco,int(ANTENA_HEIGHT)])
+    except:pass
+def proses ():
+    try:
+        SITE_ID,NE_ID,SITE_NAME,LONG,LAT,BAND,BTS_TYPE,SECTOR,toco,ANTENA_HEIGHT = dq.loc[0,'Site ID'],dq.loc[0,'NE ID'],dq.loc[0,'Site_Name'],dq.loc[0,'Longitude'],dq.loc[0,'Latitude'],dq.loc[0,'Legend'],dq.loc[0,'Cell_Type'],f'{dq.loc[0,'Sector']}_{dq.loc[1,'Sector']}_{dq.loc[2,'Sector']}',dq.loc[0,'toco'],dq.loc[0,'Antenna Height ']
+        data.append([area,region,vendor,SITE_ID,NE_ID,SITE_NAME,LONG,LAT,system,BAND,BTS_TYPE,SECTOR,toco,int(ANTENA_HEIGHT)])
+    except:pass
+dfs = []
+for s in lissite:
+    ds = df[df['Site ID'] == s]
+    
+    lisband = ['L1800']#set(ds['Legend'])
+    for band in lisband:
+        dq = ds[ds['Legend'] == band].reset_index()
+        if len(dq['Site ID']) == 1: 
+            satu ()
+        elif len(dq['Site ID']) == 2: 
+            dua ()
+        elif len(dq['Site ID']) == 3: 
+            tiga ()
+        else:
+            proses()
+
+    dss1 = ds[ds['Sector'] == 1]
+    typa = set(dss1['Ant_Type'])
+    ntypa = Counter(typa)
+    typ_ant1 = ''
+    for k,v in ntypa.items():
+        typ_ant1 = f'{typ_ant1}/{v}*{k}'
+    typ_ant1 = typ_ant1.replace('/','',1)
+
+    dss2 = ds[ds['Sector'] == 2]
+    typa = set(dss2['Ant_Type'])
+    ntypa = Counter(typa)
+    typ_ant2 = ''
+    for k,v in ntypa.items():
+        typ_ant2 = f'{typ_ant2}/{v}*{k}'
+    typ_ant2 = typ_ant2.replace('/','',1)
+
+    dss3 = ds[ds['Sector'] == 2]
+    typa = set(dss3['Ant_Type'])
+    ntypa = Counter(typa)
+    typ_ant3 = ''
+    for k,v in ntypa.items():
+        typ_ant3 = f'{typ_ant3}/{v}*{k}'
+    typ_ant3 = typ_ant3.replace('/','',1)
+
+    typ_ant = f'{typ_ant1}//{typ_ant2}//{typ_ant3}'
+    dfs.append([s,typ_ant])
+dafi = pd.DataFrame(data,columns=head_IRR)
+dase = pd.DataFrame(dfs,columns=['SITE_ID','Type_Ant'])
+irr = pd.merge(dafi,dase,on='SITE_ID',how='left')
+print(irr)
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
