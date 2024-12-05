@@ -1,0 +1,42 @@
+import pandas as pd
+from collections import Counter
+import time
+start_time = time.time()
+
+mcom = r"D:\TSEL\MCOM_TSEL_W47_2024\MCOM_R10_4G_TSEL_W47_2024\MCOM_R10_4G_TSEL_W47_2024.xlsx"
+df = pd.read_excel(mcom)
+df = pd.DataFrame(df)
+dfd = df[['VENDOR','Site ID','Sector','Ant_Type','TypeDU','Type RRU','Legend']]
+listsite = ['BTM158','ASK001','PBR049','PBR828']
+# listsite = set(dfd['Site ID'])
+dfs = []
+for s in listsite:
+    dfds = dfd[dfd['Site ID']== s].reset_index()
+    dfds = dfds[~((dfds['Legend'] == 'L2300') & (dfds.duplicated(subset=['Sector', 'Legend'], keep='first')))] ## menghapus F2,F3 L2300
+    band = sorted(set(dfds['Legend']))
+    eb = '/'.join(['L900'] + [b for b in band if b != 'L900']) if 'L900' in band else '/'.join(band) ## mengurutkan Band
+    if dfds.loc[0,'VENDOR']=='Ericsson':
+        nubbp = len(set(dfds['TypeDU']))
+        nrru = len(dfds['Type RRU'])
+        dfsec = dfds[dfds['Sector'].isin([1,4])]
+        ant1 = len(set(dfsec['Ant_Type']))
+        dfsec = dfds[dfds['Sector'].isin([2,5])]
+        ant2 = len(set(dfsec['Ant_Type']))
+        dfsec = dfds[dfds['Sector'].isin([3,6])]
+        ant3 = len(set(dfsec['Ant_Type']))     
+        nant = ant1+ant2+ant3   
+    elif dfds.loc[0,'VENDOR']=='Huawei':
+        nubbp = len(set(dfds['TypeDU']))
+        nrru = len(dfds['Type RRU'])
+        dfsec = dfds[dfds['Sector'].isin([1,4])]
+        ant1 = len(set(dfsec['Ant_Type']))
+        dfsec = dfds[dfds['Sector'].isin([2,5])]
+        ant2 = len(set(dfsec['Ant_Type']))
+        dfsec = dfds[dfds['Sector'].isin([3,6])]
+        ant3 = len(set(dfsec['Ant_Type']))     
+        nant = ant1+ant2+ant3
+    Scenario = f'Dismantle {nubbp}*BBU + Dismantle {nrru}*RRU + Dismantle {nant}*Antenna'
+    dfs.append([s,eb,nubbp,nrru,nant,Scenario])
+print(pd.DataFrame(dfs,columns=['SiteID','ExistingBand','UBBP','RRU','Ant','Detail Scenario']))
+end_time = time.time()
+print (f'Execution time:{end_time-start_time} seconds')
