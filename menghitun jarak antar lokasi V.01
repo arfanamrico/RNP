@@ -1,0 +1,18 @@
+from geopy.distance import geodesic
+import pandas as pd
+
+dbsite = r"D:\Parsing\dbsite.csv"
+dfdb = pd.read_csv(dbsite)
+dfdb = pd.DataFrame(dfdb)
+dfdb['siteid_sc'] = 'PAR271'
+dfdb['longitude_sc'] = 100.283810
+dfdb['latitude_sc'] = -0.662290
+# Fungsi untuk menghitung jarak
+def hitung_jarak(row):
+    titik1 = (row['latitude'], row['longitude'])
+    titik2 = (row['latitude_sc'], row['longitude_sc'])
+    return geodesic(titik1, titik2).meters
+
+# Menambahkan kolom 'Jarak'
+dfdb['Jarak'] = dfdb.apply(hitung_jarak, axis=1)
+print(dfdb)
