@@ -1,0 +1,10 @@
+from geopy.distance import geodesic
+
+# Koordinat lokasi dalam format (latitude, longitude)
+par519_coords = (-0.671132, 100.288414)
+par271_coords = (-0.66229, 100.28381)
+
+# Menghitung jarak menggunakan geodesic
+jarak = geodesic(par519_coords, par271_coords).meters
+
+print(f"Jarak antara PAR519 dan PAR271 adalah {jarak:.2f} meter.")
