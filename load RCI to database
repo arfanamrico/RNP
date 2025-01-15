@@ -1,0 +1,59 @@
+import pandas as pd
+import os
+import psycopg2
+from sqlalchemy import create_engine
+import time
+start_time = time.time()
+
+# File path ganti sesuai RCI yg akan di load
+pile = r"D:\TSEL\RCI\Sector\New folder"
+
+# Database connection configuration
+DB_NAME = 'tsel'
+DB_USER = 'postgres'
+DB_PASSWORD = '1234'
+DB_HOST = 'localhost'
+DB_PORT = 5432
+
+# ganti nama table sesuai data yg akan di load, rci_cell atau rci_sector
+table_name = "rci_sector"
+# create_table_sql = generate_create_table_sql(table_name, data)
+def updat_to_database():
+    # Load data from CSV
+  data = pd.read_csv(path)
+  data = data[data['region']=='SUMBAGTENG'].reset_index()
+  # Connect to PostgreSQL and execute table creation
+  try:
+      # Connect to the PostgreSQL database
+      with psycopg2.connect(
+          dbname=DB_NAME,
+          user=DB_USER,
+          password=DB_PASSWORD,
+          host=DB_HOST,
+          port=DB_PORT,
+      ) as conn:
+          with conn.cursor() as cur:
+              # Load data into the table
+              for _, row in data.iterrows():
+                  # Exclude the index column if it exists
+                  columns = ', '.join([f"\"{col}\"" for col in data.columns if col != "index"])
+                  values = ', '.join(['%s'] * len([col for col in data.columns if col != "index"]))
+                  insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
+                  
+                  # Exclude the index value when passing row data
+                  row_data = tuple(row[col] for col in data.columns if col != "index")
+                  cur.execute(insert_query, row_data)
+              conn.commit()
+              print(f"Data {name} loaded into {table_name} successfully.")
+  except Exception as e:
+      print(f"An error occurred: {e}")
+
+for name in os.listdir(pile):
+    path = os.path.join(pile, name)
+    if path.endswith('.csv') and os.path.isfile(path):
+        updat_to_database()
+
+end_time = time.time()
+dursec = end_time-start_time
+durmen = dursec / 60
+print (f'Execution time:{end_time-start_time:.2f} seconds atau {durmen:.2f} menit oleh Premanzx')
