@@ -28,6 +28,9 @@ engine = create_engine(connection_string)
 def generate_create_table_sql(table_name, df):
     sql = f"CREATE TABLE IF NOT EXISTS {table_name} ("
     for column in df.columns:
+        # Skip the index column if it exists
+        if column == "index":
+            continue
         col_name = f"\"{column}\""  # Wrap column name with double quotes
         col_type = "TEXT"  # Default to TEXT
         if df[column].dtype == "int64":
@@ -59,10 +62,14 @@ try:
             
             # Load data into the table
             for _, row in data.iterrows():
-                columns = ', '.join([f"\"{col}\"" for col in data.columns])
-                values = ', '.join(['%s'] * len(data.columns))
+                # Exclude the index column if it exists
+                columns = ', '.join([f"\"{col}\"" for col in data.columns if col != "index"])
+                values = ', '.join(['%s'] * len([col for col in data.columns if col != "index"]))
                 insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
-                cur.execute(insert_query, tuple(row))
+                
+                # Exclude the index value when passing row data
+                row_data = tuple(row[col] for col in data.columns if col != "index")
+                cur.execute(insert_query, row_data)
             conn.commit()
             print(f"Data loaded into {table_name} successfully.")
 except Exception as e:
